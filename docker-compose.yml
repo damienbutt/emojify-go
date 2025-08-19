@@ -1,0 +1,42 @@
+services:
+  emojify:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
+      cache_from:
+        - type=gha
+      cache_to:
+        - type=gha,mode=max
+    image: ghcr.io/damienbutt/emojify:latest
+    container_name: emojify
+    restart: unless-stopped
+    # Uncomment and modify as needed for your use case
+    # volumes:
+    #   - ./input:/input:ro
+    #   - ./output:/output
+    # environment:
+    #   - EMOJIFY_CONFIG=production
+    # command: ["--help"]
+
+  # Development service for local testing
+  emojify-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    image: emojify:dev
+    container_name: emojify-dev
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ["sleep", "infinity"]
+    profiles:
+      - dev
+
+# Networks (optional)
+networks:
+  default:
+    name: emojify-network

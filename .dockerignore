@@ -1,0 +1,51 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
+*.md
+
+# Build artifacts
+build/
+dist/
+coverage.out
+coverage.html
+test-results.json
+benchmark-results.txt
+make_test_result.txt
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD files
+.github/
+lefthook.yml
+
+# Scripts and tools
+scripts/
+Makefile
+
+# Test files (exclude from production builds)
+*_test.go
+tests/
+
+# Assets (if not needed in container)
+assets/
