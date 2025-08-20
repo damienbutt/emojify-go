@@ -168,6 +168,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, lint]
     if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -179,14 +183,14 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/emojify-go
+          images: ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
