@@ -87,33 +87,22 @@ git:
   ignore_tags:
     - "nightly"
 
-# Homebrew tap
+# Homebrew formula (stored in main repo)
 brews:
   - name: emojify-go
     repository:
       owner: damienbutt
-      name: homebrew-tap
-      branch: main
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    url_template: "https://github.com/damienbutt/emojify-go/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    download_strategy: CurlDownloadStrategy
-    homepage: "https://github.com/damienbutt/emojify-go"
-    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
-    license: "MIT"
-    skip_upload: false
-    test: |
-      system "#{bin}/emojify --version"
-      assert_match "Hello 😁 world", shell_output("echo 'Hello :grin: world' | #{bin}/emojify")
-    install: |
-      bin.install "emojify"
-
-  # Local Homebrew formula (maintained in repo)
-  - name: emojify-go
+      name: emojify-go
+      branch: master
+      token: "{{ .Env.GITHUB_TOKEN }}"
     directory: package/homebrew
     homepage: "https://github.com/damienbutt/emojify-go"
     description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
     license: "MIT"
-    skip_upload: true
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     test: |
       system "#{bin}/emojify --version"
       assert_match "Hello 😁 world", shell_output("echo 'Hello :grin: world' | #{bin}/emojify")
@@ -262,7 +251,7 @@ nfpms:
     meta: true
     contents:
       - src: "package/aur/emojify-go-bin/PKGBUILD"
-      dst: "PKGBUILD"
+        dst: "PKGBUILD"
         file_info:
           mode: 0755
       - src: ./LICENSE.md
