@@ -1,0 +1,50 @@
+{
+    "version": "0.0.0",
+    "description": "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis",
+    "homepage": "https://github.com/damienbutt/emojify-go",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/damienbutt/emojify-go/releases/download/v0.0.0/emojify-go_0.0.0_windows_amd64.zip",
+            "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "32bit": {
+            "url": "https://github.com/damienbutt/emojify-go/releases/download/v0.0.0/emojify-go_0.0.0_windows_386.zip",
+            "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "arm64": {
+            "url": "https://github.com/damienbutt/emojify-go/releases/download/v0.0.0/emojify-go_0.0.0_windows_arm64.zip",
+            "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+    },
+    "bin": "emojify.exe",
+    "checkver": {
+        "github": "https://github.com/damienbutt/emojify-go"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/damienbutt/emojify-go/releases/download/v$version/emojify-go_$version_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/damienbutt/emojify-go/releases/download/v$version/emojify-go_$version_windows_386.zip"
+            },
+            "arm64": {
+                "url": "https://github.com/damienbutt/emojify-go/releases/download/v$version/emojify-go_$version_windows_arm64.zip"
+            }
+        },
+        "hash": {
+            "url": "$baseurl/emojify-go_$version_checksums.txt"
+        }
+    },
+    "notes": [
+        "emojify-go is a lightning-fast emoji converter.",
+        "",
+        "Usage examples:",
+        "  echo 'Hello :wave: world' | emojify",
+        "  emojify 'I love :heart: coding'",
+        "  emojify --decode 'Hello 👋 world'",
+        "",
+        "For more information, run: emojify --help"
+    ]
+}

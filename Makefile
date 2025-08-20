@@ -336,6 +336,83 @@ package: build-all
 	done
 	@echo "✅ Distribution packages created in $(DIST_DIR)/"
 
+# Test package manifests
+.PHONY: test-packages
+test-packages:
+	@echo "🧪 Testing package manifests..."
+	@./package/maintain.sh test
+
+# Test Homebrew formula
+.PHONY: test-homebrew
+test-homebrew:
+	@echo "🍺 Testing Homebrew formula..."
+	@./package/maintain.sh test-homebrew
+
+# Test Scoop manifest
+.PHONY: test-scoop
+test-scoop:
+	@echo "🪣 Testing Scoop manifest..."
+	@./package/maintain.sh test-scoop
+
+# Test AUR packages
+.PHONY: test-aur
+test-aur:
+	@echo "📦 Testing AUR packages..."
+	@./package/maintain.sh test-aur
+
+# Test Nix packages
+.PHONY: test-nix
+test-nix:
+	@echo "❄️ Testing Nix packages..."
+	@./package/maintain.sh test-nix
+
+# Test WinGet manifests
+.PHONY: test-winget
+test-winget:
+	@echo "📦 Testing WinGet manifests..."
+	@./package/maintain.sh test-winget
+
+# Test Chocolatey package
+.PHONY: test-chocolatey
+test-chocolatey:
+	@echo "🍫 Testing Chocolatey package..."
+	@./package/maintain.sh test-chocolatey
+
+# Show package status
+.PHONY: package-status
+package-status:
+	@./package/maintain.sh status
+
+# Test local package generation with GoReleaser
+.PHONY: test-local-release
+test-local-release:
+	@echo "🚀 Testing local package generation..."
+	@goreleaser release --config .goreleaser-local.yml --snapshot --clean --skip=publish
+
+# Generate man page
+.PHONY: man
+man:
+	@echo "📖 Generating man page..."
+	@./docs/man/manage-man.sh generate
+
+# Test man page
+.PHONY: test-man
+test-man:
+	@echo "🧪 Testing man page..."
+	@./docs/man/manage-man.sh test
+
+# Preview man page
+.PHONY: preview-man
+preview-man:
+	@echo "👀 Previewing man page..."
+	@./docs/man/manage-man.sh preview
+
+# Install man page locally
+.PHONY: install-man
+install-man:
+	@echo "📥 Installing man page locally..."
+	@./docs/man/manage-man.sh install-local
+
 # Development workflow: clean, build, and run
 .PHONY: dev
 dev: clean build run

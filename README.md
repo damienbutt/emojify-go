@@ -35,13 +35,13 @@ git log --oneline | emojify | head -5
 -   🛡️ **Production Ready**: Comprehensive tests, benchmarks, and error handling
 -   🎨 **Modern CLI**: Built with urfave/cli for excellent UX
 
-## 🎬 Demo
+<!-- ## 🎬 Demo
 
 <p align="center">
   <img src="./assets/img/demo.gif" alt="Emojify-Go Demo" width="800">
 </p>
 
-_Lightning-fast emoji conversion in action! See the 169.9x performance improvement over the original bash version._
+_Lightning-fast emoji conversion in action! See the 169.9x performance improvement over the original bash version._ -->
 
 ## 📦 Installation
 
@@ -450,6 +450,34 @@ go vet ./...
 # Security scan
 gosec ./...
 ```
+
+### Package Management
+
+The repository maintains package manifests for various package managers:
+
+```bash
+# Test all package manifests
+make test-packages
+
+# Test specific package managers
+make test-homebrew            # Test Homebrew formula
+make test-scoop              # Test Scoop manifest
+
+# Show package status
+make package-status
+
+# Test local package generation
+make test-local-release      # Uses GoReleaser
+```
+
+**Package Manifests Location:**
+
+-   `package/homebrew/emojify-go.rb` - Homebrew formula
+-   `package/scoop/emojify-go.json` - Scoop manifest
+-   `package/aur/` - Arch Linux packages (PKGBUILD files)
+-   `package/nix/flake.nix`, `package/nix/default.nix` - Nix packages
+
+See [`package/README.md`](package/README.md) for detailed package management documentation.
 
 ### Project Structure
 

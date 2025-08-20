@@ -48,6 +48,7 @@ archives:
     files:
       - README.md
       - LICENSE.md
+      - docs/man/emojify.1
 
 checksum:
   name_template: "checksums.txt"
@@ -106,6 +107,19 @@ brews:
     install: |
       bin.install "emojify"
 
+  # Local Homebrew formula (maintained in repo)
+  - name: emojify-go
+    directory: package/homebrew
+    homepage: "https://github.com/damienbutt/emojify-go"
+    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
+    license: "MIT"
+    skip_upload: true
+    test: |
+      system "#{bin}/emojify --version"
+      assert_match "Hello 😁 world", shell_output("echo 'Hello :grin: world' | #{bin}/emojify")
+    install: |
+      bin.install "emojify"
+
 # Scoop bucket for Windows - targeting main repository
 scoops:
   - name: emojify-go
@@ -123,6 +137,14 @@ scoops:
       email: bot@goreleaser.com
     commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
     skip_upload: false
+
+  # Local Scoop manifest (maintained in repo)
+  - name: emojify-go
+    directory: package/scoop
+    homepage: "https://github.com/damienbutt/emojify-go"
+    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
+    license: MIT
+    skip_upload: true
 
 # Chocolatey package for Windows
 chocolateys:
@@ -150,6 +172,26 @@ chocolateys:
     source_repo: "https://push.chocolatey.org/"
     skip_publish: false
 
+  # Local Chocolatey manifest (maintained in repo)
+  - name: emojify-go
+    title: Emojify-Go
+    directory: package/chocolatey
+    authors: Damien Butt
+    project_url: https://github.com/damienbutt/emojify-go
+    copyright: 2025 Damien Butt
+    license_url: https://github.com/damienbutt/emojify-go/blob/main/LICENSE
+    require_license_acceptance: false
+    project_source_url: https://github.com/damienbutt/emojify-go
+    docs_url: https://github.com/damienbutt/emojify-go/blob/main/README.md
+    bug_tracker_url: https://github.com/damienbutt/emojify-go/issues
+    tags: "emojify-go emoji cli golang unicode converter terminal shell productivity"
+    summary: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
+    description: |
+      emojify-go is a lightning-fast, cross-platform command-line tool for bidirectional emoji conversion.
+      Convert between emoji aliases (:smile:) and Unicode emoji characters (😄) seamlessly.
+      This is a complete Go rewrite with 169.9x better performance.
+    skip_publish: true
+
 # WinGet package for Windows
 winget:
   - name: emojify-go
@@ -174,6 +216,20 @@ winget:
           owner: microsoft
           name: winget-pkgs
           branch: master
+
+  # Local WinGet manifest (maintained in repo)
+  - name: emojify-go
+    publisher: damienbutt
+    directory: package/winget
+    license: MIT
+    homepage: https://github.com/damienbutt/emojify-go
+    short_description: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis
+    description: |
+      Emojify-Go is a lightning-fast Go rewrite of the original emojify bash script.
+      It replaces emoji aliases (like :grin:) with actual emoji characters with 169.9x
+      better performance. Perfect for processing git logs, documentation, and any text
+      containing emoji aliases.
+    skip_upload: true
 
 # Linux packages
 nfpms:
@@ -205,8 +261,8 @@ nfpms:
     priority: optional
     meta: true
     contents:
-      - src: ./emojify
-        dst: /usr/bin/emojify
+      - src: "package/aur/emojify-go-bin/PKGBUILD"
+      dst: "PKGBUILD"
         file_info:
           mode: 0755
       - src: ./LICENSE.md

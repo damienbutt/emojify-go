@@ -1,0 +1,71 @@
+# Local GoReleaser configuration for testing package manifests
+# Usage: goreleaser release --config .goreleaser-local.yml --snapshot --clean
+# This config is for testing local package manifest generation only
+
+project_name: emojify-go
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main: ./cmd/emojify
+    binary: emojify
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - "386"
+      - amd64
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: "386"
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "checksums.txt"
+
+# Local package manifests only (skip external uploads)
+brews:
+  - name: emojify-go
+    directory: package/homebrew
+    homepage: "https://github.com/damienbutt/emojify-go"
+    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
+    license: "MIT"
+    skip_upload: true
+    test: |
+      system "#{bin}/emojify --version"
+      assert_match "Hello 😁 world", shell_output("echo 'Hello :grin: world' | #{bin}/emojify")
+    install: |
+      bin.install "emojify"
+
+scoops:
+  - name: emojify-go
+    directory: package/scoop
+    homepage: "https://github.com/damienbutt/emojify-go"
+    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
+    license: MIT
+    skip_upload: true
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
