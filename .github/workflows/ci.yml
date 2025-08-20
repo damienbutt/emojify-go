@@ -186,7 +186,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/emojify
+          images: ghcr.io/${{ github.repository_owner }}/emojify-go
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -195,7 +195,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64

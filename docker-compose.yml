@@ -1,5 +1,5 @@
 services:
-  emojify:
+  emojify-go:
     build:
       context: .
       dockerfile: Dockerfile
@@ -10,16 +10,9 @@ services:
         - type=gha
       cache_to:
         - type=gha,mode=max
-    image: ghcr.io/damienbutt/emojify:latest
-    container_name: emojify
-    restart: unless-stopped
-    # Uncomment and modify as needed for your use case
-    # volumes:
-    #   - ./input:/input:ro
-    #   - ./output:/output
-    # environment:
-    #   - EMOJIFY_CONFIG=production
-    # command: ["--help"]
+    image: ghcr.io/damienbutt/emojify-go:latest
+    container_name: emojify-go
+    restart: never
 
   # Development service for local testing
   emojify-dev:
@@ -27,7 +20,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: builder
-    image: emojify:dev
+    image: emojify-go:dev
     container_name: emojify-dev
     volumes:
       - .:/app
