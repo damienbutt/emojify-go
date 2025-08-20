@@ -103,6 +103,25 @@ winget install damienbutt.emojify-go
 
 </details>
 
+<details>
+<summary><strong>❄️ NixOS / Nix</strong></summary>
+
+```bash
+# Using Nix Flakes (recommended)
+nix profile install github:damienbutt/emojify-go
+
+# Run without installing
+nix run github:damienbutt/emojify-go
+
+# Traditional Nix
+nix-env -f default.nix -i emojify-go
+
+# Development environment
+nix develop github:damienbutt/emojify-go
+```
+
+</details>
+
 ### 🐳 Docker
 
 ```bash

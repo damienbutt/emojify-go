@@ -1,0 +1,39 @@
+# Maintainer: Damien Butt <damien@damienbutt.com>
+pkgname=emojify-go-bin
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis (binary)"
+arch=('x86_64' 'aarch64')
+url="https://github.com/damienbutt/emojify-go"
+license=('MIT')
+depends=('glibc')
+provides=('emojify' 'emojify-go')
+conflicts=('emojify' 'emojify-go' 'emojify-git')
+source_x86_64=("$pkgname-$pkgver-x86_64.tar.gz::https://github.com/damienbutt/emojify-go/releases/download/v$pkgver/emojify-go_Linux_x86_64.tar.gz")
+source_aarch64=("$pkgname-$pkgver-aarch64.tar.gz::https://github.com/damienbutt/emojify-go/releases/download/v$pkgver/emojify-go_Linux_arm64.tar.gz")
+sha256sums_x86_64=('SKIP')  # Update with actual checksums
+sha256sums_aarch64=('SKIP')  # Update with actual checksums
+noextract=("$pkgname-$pkgver-x86_64.tar.gz" "$pkgname-$pkgver-aarch64.tar.gz")
+
+prepare() {
+    # Extract the appropriate archive based on architecture
+    case "$CARCH" in
+        x86_64)
+            tar -xf "$pkgname-$pkgver-x86_64.tar.gz"
+            ;;
+        aarch64)
+            tar -xf "$pkgname-$pkgver-aarch64.tar.gz"
+            ;;
+    esac
+}
+
+package() {
+    # Install binary
+    install -Dm755 emojify "$pkgdir/usr/bin/emojify"
+
+    # Install license
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
+    # Install documentation
+    install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+}

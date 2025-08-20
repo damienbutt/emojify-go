@@ -22,7 +22,6 @@ build/
 dist/
 
 # IDE files
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -49,6 +48,11 @@ test_*.txt
 tmp/
 temp/
 *.tmp
+
+# Nix
+result
+result-*
+.direnv/
 *.temp
 
 # Coverage files
@@ -60,3 +64,12 @@ performance_results.txt
 
 # GoReleaser artifacts
 .goreleaser.yml.bak
+
+# AUR package build artifacts
+aur/*/pkg/
+aur/*/src/
+aur/*/*.tar.xz
+aur/*/*.tar.gz
+aur/*/*.pkg.tar.*
+aur/*/emojify-go/
+aur/*/emojify-go-*/

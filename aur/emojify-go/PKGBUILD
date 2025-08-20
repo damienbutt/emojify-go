@@ -1,0 +1,50 @@
+# Maintainer: Damien Butt <damien@damienbutt.com>
+pkgname=emojify-go
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
+arch=('x86_64' 'aarch64' 'armv7h')
+url="https://github.com/damienbutt/emojify-go"
+license=('MIT')
+depends=('glibc')
+makedepends=('go' 'git')
+provides=('emojify')
+conflicts=('emojify' 'emojify-git')
+source=("$pkgname-$pkgver.tar.gz::https://github.com/damienbutt/$pkgname/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')  # Update this with actual checksum when releasing
+
+prepare() {
+    cd "$pkgname-$pkgver"
+    mkdir -p build/
+}
+
+build() {
+    cd "$pkgname-$pkgver"
+    export CGO_ENABLED=0
+    export GOFLAGS="-buildmode=pie -trimpath -ldflags=-linkmode=external"
+    export LDFLAGS="-s -w"
+
+    go build \
+        -ldflags="-s -w -X github.com/damienbutt/emojify-go/internal/version.Version=$pkgver -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=makepkg" \
+        -o build/emojify \
+        ./cmd/emojify
+}
+
+check() {
+    cd "$pkgname-$pkgver"
+    go test ./...
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+
+    # Install binary
+    install -Dm755 build/emojify "$pkgdir/usr/bin/emojify"
+
+    # Install license
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
+    # Install documentation
+    install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+    install -Dm644 CHANGELOG.md "$pkgdir/usr/share/doc/$pkgname/CHANGELOG.md"
+}

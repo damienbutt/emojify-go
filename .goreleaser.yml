@@ -291,6 +291,23 @@ aurs:
 # Note: emojify-go (source package) must be created manually on AUR
 # GoReleaser only supports binary AUR packages
 
+# Nix packages
+nix:
+  - name: emojify-go
+    repository:
+      owner: damienbutt
+      name: nur-packages
+      branch: master
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    homepage: "https://github.com/damienbutt/emojify-go"
+    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
+    license: "mit"
+    path: pkgs/emojify-go/default.nix
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    skip_upload: false
+
 # Docker images
 dockers:
   - image_templates:
