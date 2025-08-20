@@ -393,7 +393,7 @@ update_versions() {
     warn "Note: You'll need to update checksums manually or let GoReleaser handle them"
 }
 
-# Show package status
+# Show current package status
 show_status() {
     log "Package Manifest Status"
     echo "========================"

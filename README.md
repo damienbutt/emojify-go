@@ -126,10 +126,10 @@ nix develop github:damienbutt/emojify-go
 
 ```bash
 # Run directly
-echo "Hello :wave: world" | docker run --rm -i ghcr.io/damienbutt/emojify
+echo "Hello :wave: world" | docker run --rm -i ghcr.io/damienbutt/emojify-go
 
 # Use as alias
-alias emojify='docker run --rm -i ghcr.io/damienbutt/emojify'
+alias emojify='docker run --rm -i ghcr.io/damienbutt/emojify-go'
 ```
 
 ### 📥 Direct Download
@@ -138,23 +138,23 @@ Download the latest binary for your platform from the [releases page](https://gi
 
 ```bash
 # Linux (AMD64)
-curl -L https://github.com/damienbutt/emojify/releases/latest/download/emojify_linux_amd64.tar.gz | tar xz
-sudo mv emojify /usr/local/bin/
+curl -L https://github.com/damienbutt/emojify/releases/latest/download/emojify-go_linux_amd64.tar.gz | tar xz
+sudo mv emojify-go /usr/local/bin/emojify
 
 # macOS (ARM64)
-curl -L https://github.com/damienbutt/emojify/releases/latest/download/emojify_darwin_arm64.tar.gz | tar xz
-sudo mv emojify /usr/local/bin/
+curl -L https://github.com/damienbutt/emojify/releases/latest/download/emojify-go_darwin_arm64.tar.gz | tar xz
+sudo mv emojify-go /usr/local/bin/emojify
 
 # Windows (AMD64)
-curl -L https://github.com/damienbutt/emojify/releases/latest/download/emojify_windows_amd64.zip -o emojify.zip
+curl -L https://github.com/damienbutt/emojify/releases/latest/download/emojify-go_windows_amd64.zip -o emojify.zip
 unzip emojify.zip
 ```
 
 ### 🛠️ Build from Source
 
 ```bash
-git clone https://github.com/damienbutt/emojify.git
-cd emojify
+git clone https://github.com/damienbutt/emojify-go.git
+cd emojify-go
 make build
 ./build/emojify "Hello :wave:"
 ```
@@ -162,7 +162,7 @@ make build
 ### 📥 Go Install
 
 ```bash
-go install github.com/damienbutt/emojify/cmd/emojify@latest
+go install github.com/damienbutt/emojify-go/cmd/emojify@latest
 ```
 
 ## 🚀 Usage
@@ -378,6 +378,45 @@ seq 1 10000 | sed 's/.*/:rocket: Line &/' | time emojify > /dev/null
 # See all 2,500+ available emojis
 emojify --list | head -20
 ```
+
+## 📖 Documentation
+
+### Man Page
+
+Emojify includes a comprehensive Unix manual page that provides detailed documentation about all commands and options.
+
+#### **Access Methods**
+
+```bash
+# View embedded man page (works anywhere)
+emojify --show-man
+
+# Install man page to system (for `man emojify`)
+emojify --install-man
+
+# Use standard man command (after installation)
+man emojify
+
+# Remove installed man page
+emojify --uninstall-man
+```
+
+#### **Package Manager Installation**
+
+When installed via package managers, the man page is automatically available:
+
+```bash
+# After installing via Homebrew, AUR, etc.
+man emojify
+```
+
+**Supported Systems**: macOS, Linux, Windows (WSL/MSYS2/Cygwin)
+
+#### **Documentation**
+
+-   📖 [Man Page Management Guide](docs/MAN_PAGE_MANAGEMENT.md) - Complete documentation setup
+-   📦 [Package Management](package/README.md) - Package distribution details
+-   🏗️ [Release Setup](docs/RELEASE_SETUP.md) - Release automation configuration
 
 ## 🏗️ Development
 

@@ -395,12 +395,6 @@ man:
 	@echo "📖 Generating man page..."
 	@./docs/man/manage-man.sh generate
 
-# Test man page
-.PHONY: test-man
-test-man:
-	@echo "🧪 Testing man page..."
-	@./docs/man/manage-man.sh test
-
 # Preview man page
 .PHONY: preview-man
 preview-man:

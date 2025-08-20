@@ -20,3 +20,13 @@ $exePath = Join-Path $toolsDir 'emojify.exe'
 if (Test-Path $exePath) {
     Install-BinFile -Name 'emojify' -Path $exePath
 }
+
+# Install man page for WSL/Cygwin/MSYS2 environments
+$manPath = Join-Path $toolsDir 'docs\man\emojify.1'
+if (Test-Path $manPath) {
+    $manDir = Join-Path $env:ChocolateyInstall 'share\man\man1'
+    if (-not (Test-Path $manDir)) {
+        New-Item -ItemType Directory -Path $manDir -Force | Out-Null
+    }
+    Copy-Item -Path $manPath -Destination (Join-Path $manDir 'emojify.1') -Force
+}
