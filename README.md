@@ -584,13 +584,13 @@ git config --global commit.template ~/.gitmessage
 
 ```bash
 # Run with stdin
-echo "Hello :wave: Docker" | docker run --rm -i ghcr.io/damienbutt/emojify
+echo "Hello :wave: Docker" | docker run --rm -i ghcr.io/damienbutt/emojify-go
 
 # Process files
-docker run --rm -v $(pwd):/workspace -w /workspace ghcr.io/damienbutt/emojify "$(cat input.txt)"
+docker run --rm -v $(pwd):/workspace -w /workspace ghcr.io/damienbutt/emojify-go "$(cat input.txt)"
 
 # Multi-architecture support
-docker run --platform linux/arm64 --rm -i ghcr.io/damienbutt/emojify
+docker run --platform linux/arm64 --rm -i ghcr.io/damienbutt/emojify-go
 ```
 
 ### Building Custom Image
