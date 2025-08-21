@@ -60,7 +60,6 @@ echo "----------------------------------"
 check_secret "GITHUB_TOKEN" "true" "GitHub Actions token (auto-provided)"
 check_secret "HOMEBREW_TAP_GITHUB_TOKEN" "true" "Token for Homebrew tap repository"
 # NOTE: SCOOP_BUCKET_GITHUB_TOKEN not needed when targeting main Scoop repository
-check_secret "WINGET_GITHUB_TOKEN" "true" "Token for WinGet package repository"
 
 # GPG signing
 check_secret "GPG_PRIVATE_KEY" "true" "GPG private key for package signing"
@@ -68,12 +67,10 @@ check_secret "GPG_PASSPHRASE" "true" "GPG key passphrase"
 check_secret "GPG_KEY_FILE" "false" "GPG key file for RPM signing"
 
 # Package manager APIs
-check_secret "CHOCOLATEY_API_KEY" "true" "Chocolatey.org API key"
 check_secret "AUR_KEY" "true" "SSH private key for AUR publishing (both emojify-go and emojify-go-bin)"
 
 # Optional services
 check_secret "CODECOV_TOKEN" "false" "Codecov.io token for coverage reporting"
-check_secret "SNAPCRAFT_STORE_CREDENTIALS" "false" "Snap Store credentials"
 
 echo -e "\n${BLUE}🏗️  Checking Required Repositories${NC}"
 echo "--------------------------------------"

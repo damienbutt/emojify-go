@@ -71,8 +71,6 @@ check_secret() {
 # Check essential secrets
 MISSING_SECRETS=0
 check_secret "GITHUB_TOKEN" "false" || true  # Auto-provided by GitHub Actions
-check_secret "CHOCOLATEY_API_KEY" "true" || ((MISSING_SECRETS++))
-check_secret "WINGET_GITHUB_TOKEN" "true" || ((MISSING_SECRETS++))
 check_secret "AUR_SSH_PRIVATE_KEY" "true" || ((MISSING_SECRETS++))
 
 if [[ $MISSING_SECRETS -gt 0 ]]; then
@@ -87,8 +85,6 @@ print_status "3. Testing build process (no publishing)..."
 
 # Set dummy environment variables for testing
 export GITHUB_TOKEN="dummy"
-export CHOCOLATEY_API_KEY="dummy"
-export WINGET_GITHUB_TOKEN="dummy"
 export AUR_KEY="dummy"
 export GPG_KEY_FILE="dummy"
 
@@ -103,79 +99,7 @@ TEMP_BIN_DIR=$(mktemp -d)/bin
 mkdir -p "$TEMP_BIN_DIR"
 export PATH="$TEMP_BIN_DIR:$PATH"
 
-# Check and install chocolatey CLI
-if ! command -v choco >/dev/null 2>&1; then
-    print_warning "Installing chocolatey CLI temporarily..."
-
-    # Create temporary directory for choco installation
-    TEMP_DIR=$(mktemp -d)
-    cd "$TEMP_DIR"
-
-    # Download and extract chocolatey CLI
-    if curl -sSL "https://github.com/chocolatey/choco/releases/download/2.5.0/chocolatey.v2.5.0.tar.gz" -o choco.tar.gz; then
-        tar -xzf choco.tar.gz
-
-        # Copy choco executable to temp bin
-        cp choco.exe "$TEMP_BIN_DIR/"
-
-        # Create wrapper script
-        if command -v mono >/dev/null 2>&1; then
-            cat > "$TEMP_BIN_DIR/choco" << EOF
-#!/bin/bash
-exec mono "$TEMP_BIN_DIR/choco.exe" "\$@"
-EOF
-            chmod +x "$TEMP_BIN_DIR/choco"
-            print_success "Chocolatey CLI installed temporarily"
-        else
-            print_warning "Mono not found - installing via Homebrew..."
-            if command -v brew >/dev/null 2>&1; then
-                brew install mono >/dev/null 2>&1
-                cat > "$TEMP_BIN_DIR/choco" << EOF
-#!/bin/bash
-exec mono "$TEMP_BIN_DIR/choco.exe" "\$@"
-EOF
-                chmod +x "$TEMP_BIN_DIR/choco"
-                print_success "Mono and Chocolatey CLI installed temporarily"
-            else
-                print_error "Cannot install chocolatey CLI - no Homebrew available"
-                SKIP_FLAGS="$SKIP_FLAGS --skip=chocolatey"
-            fi
-        fi
-    else
-        print_error "Failed to download chocolatey CLI"
-        SKIP_FLAGS="$SKIP_FLAGS --skip=chocolatey"
-    fi
-
-    cd - >/dev/null
-    rm -rf "$TEMP_DIR"
-fi
-
-# Check and install nix tools
-if ! command -v nix-hash >/dev/null 2>&1; then
-    print_warning "Installing Nix temporarily..."
-
-    if command -v brew >/dev/null 2>&1; then
-        # Try to install nix via homebrew
-        if brew install nix >/dev/null 2>&1; then
-            # Nix installs to /nix, add to PATH
-            export PATH="/nix/var/nix/profiles/default/bin:$PATH"
-            if command -v nix-hash >/dev/null 2>&1; then
-                print_success "Nix installed successfully"
-            else
-                print_warning "Nix installation completed but nix-hash not found, skipping Nix packaging"
-                SKIP_FLAGS="$SKIP_FLAGS --skip=nix"
-            fi
-        else
-            print_warning "Nix installation via Homebrew failed, skipping Nix packaging"
-            SKIP_FLAGS="$SKIP_FLAGS --skip=nix"
-        fi
-    else
-        print_warning "Cannot install Nix - no Homebrew available, skipping Nix packaging"
-        SKIP_FLAGS="$SKIP_FLAGS --skip=nix"
-    fi
-fi
-
-if goreleaser release --snapshot --clean $SKIP_FLAGS 2>/dev/null; then
+if go tool goreleaser release --snapshot --clean $SKIP_FLAGS 2>/dev/null; then
     print_success "Build process completed successfully"
 
     # Check generated artifacts
@@ -198,7 +122,7 @@ else
     print_error "Build process failed"
     echo
     echo "Try running manually with more verbose output:"
-    echo "  goreleaser release --snapshot --clean --skip=publish --skip=sign --skip=validate"
+    echo "  go tool goreleaser release --snapshot --clean --skip=publish --skip=sign --skip=validate"
     exit 1
 fi
 echo
