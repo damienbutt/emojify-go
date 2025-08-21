@@ -416,17 +416,22 @@ dev: clean build run
 .PHONY: goreleaser-check
 goreleaser-check:
 	@echo "🔍 Checking GoReleaser configuration..."
-	@go tool goreleaser check || echo "⚠️  goreleaser not found"
+	@goreleaser check || echo "⚠️  goreleaser not found"
+
+.PHONY: goreleaser-test
+goreleaser-test:
+	@echo "🧪 Running comprehensive GoReleaser test suite..."
+	@./scripts/test-goreleaser.sh
 
 .PHONY: goreleaser-build
 goreleaser-build:
 	@echo "🔨 Building with GoReleaser..."
-	@go tool goreleaser build --snapshot --clean || echo "⚠️  goreleaser not found"
+	@goreleaser build --snapshot --clean || echo "⚠️  goreleaser not found"
 
 .PHONY: goreleaser-release
 goreleaser-release:
 	@echo "🚀 Creating release with GoReleaser..."
-	@go tool goreleaser release --clean || echo "⚠️  goreleaser not found"
+	@goreleaser release --clean || echo "⚠️  goreleaser not found"
 
 .PHONY: goreleaser-release-with-changelog
 goreleaser-release-with-changelog:
@@ -543,6 +548,7 @@ help:
 	@echo ""
 	@echo "📦 Release targets:"
 	@echo "  goreleaser-check   Check GoReleaser configuration"
+	@echo "  goreleaser-test    Run comprehensive GoReleaser test suite"
 	@echo "  goreleaser-build   Build with GoReleaser"
 	@echo "  goreleaser-release Create release with GoReleaser"
 	@echo "  goreleaser-release-with-changelog Create release and commit changelog"
