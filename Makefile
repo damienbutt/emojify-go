@@ -336,58 +336,11 @@ package: build-all
 	done
 	@echo "✅ Distribution packages created in $(DIST_DIR)/"
 
-# Test package manifests
-.PHONY: test-packages
-test-packages:
-	@echo "🧪 Testing package manifests..."
-	@./package/maintain.sh test
-
-# Test Homebrew formula
-.PHONY: test-homebrew
-test-homebrew:
-	@echo "🍺 Testing Homebrew formula..."
-	@./package/maintain.sh test-homebrew
-
-# Test Scoop manifest
-.PHONY: test-scoop
-test-scoop:
-	@echo "🪣 Testing Scoop manifest..."
-	@./package/maintain.sh test-scoop
-
-# Test AUR packages
-.PHONY: test-aur
-test-aur:
-	@echo "📦 Testing AUR packages..."
-	@./package/maintain.sh test-aur
-
-# Test Nix packages
-.PHONY: test-nix
-test-nix:
-	@echo "❄️ Testing Nix packages..."
-	@./package/maintain.sh test-nix
-
-# Test WinGet manifests
-.PHONY: test-winget
-test-winget:
-	@echo "📦 Testing WinGet manifests..."
-	@./package/maintain.sh test-winget
-
-# Test Chocolatey package
-.PHONY: test-chocolatey
-test-chocolatey:
-	@echo "🍫 Testing Chocolatey package..."
-	@./package/maintain.sh test-chocolatey
-
-# Show package status
-.PHONY: package-status
-package-status:
-	@./package/maintain.sh status
-
 # Test local package generation with GoReleaser
 .PHONY: test-local-release
 test-local-release:
 	@echo "🚀 Testing local package generation..."
-	@goreleaser release --config .goreleaser-local.yml --snapshot --clean --skip=publish
+	@go tool goreleaser release --config .goreleaser-local.yml --snapshot --clean --skip=publish
 
 # Generate man page
 .PHONY: man
