@@ -34,11 +34,11 @@ print_error() {
 
 # 1. Configuration validation
 print_status "1. Validating GoReleaser configuration..."
-if goreleaser check 2>/dev/null; then
+if go tool goreleaser check 2>/dev/null; then
     print_success "Configuration is valid"
 else
     echo "   Checking with warnings..."
-    goreleaser check || {
+    go tool goreleaser check || {
         if [[ $? -eq 2 ]]; then
             print_warning "Configuration valid but has deprecation warnings"
         else
