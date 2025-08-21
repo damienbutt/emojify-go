@@ -104,11 +104,11 @@ jobs:
           echo "This is a dry-run test with no skipping of any components."
           echo
 
-          # Enable debug mode if requested
-          DEBUG_FLAGS=""
+          # Enable verbose mode if requested
+          VERBOSE_FLAGS=""
           if [[ "${{ inputs.debug }}" == "true" ]]; then
-            DEBUG_FLAGS="--debug"
-            echo "🐛 Debug mode enabled"
+            VERBOSE_FLAGS="--verbose"
+            echo "🐛 Verbose mode enabled"
           fi
 
           # Run GoReleaser with minimal skipping (only publish and sign)
@@ -119,7 +119,7 @@ jobs:
             --skip=publish \
             --skip=sign \
             --skip=validate \
-            $DEBUG_FLAGS
+            $VERBOSE_FLAGS
 
       - name: Verify generated artifacts
         run: |
