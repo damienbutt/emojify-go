@@ -27,6 +27,7 @@ func ScrapeGitHubEmojis() (*ScraperResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch emoji data: %w", err)
 	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {

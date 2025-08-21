@@ -2593,6 +2593,7 @@ func GetEmoji(alias string) string {
 	if emoji, exists := EmojiMap[alias]; exists {
 		return emoji
 	}
+
 	return alias
 }
 
@@ -2602,6 +2603,7 @@ func GetAlias(emoji string) string {
 	if alias, exists := ReverseEmojiMap[emoji]; exists {
 		return alias
 	}
+
 	return emoji
 }
 
@@ -2617,12 +2619,14 @@ func ListAllEmojis() []string {
 	for alias := range EmojiMap {
 		aliases = append(aliases, alias)
 	}
+
 	sort.Strings(aliases)
 
 	result := make([]string, len(aliases))
 	for i, alias := range aliases {
 		result[i] = fmt.Sprintf("%s %s", alias, EmojiMap[alias])
 	}
+
 	return result
 }
 
@@ -2647,5 +2651,6 @@ func HasEmojiCharacters(text string) bool {
 			return true
 		}
 	}
+
 	return false
 }

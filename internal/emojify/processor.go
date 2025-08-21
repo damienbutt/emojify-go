@@ -142,5 +142,6 @@ func ListEmojis() error {
 	for _, emoji := range emojis {
 		fmt.Println(emoji)
 	}
+
 	return nil
 }
