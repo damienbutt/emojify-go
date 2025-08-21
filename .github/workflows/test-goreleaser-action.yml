@@ -1,0 +1,183 @@
+name: Test GoReleaser (Manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test-goreleaser-action:
+    name: Test GoReleaser Configuration (Dry Run)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Verify GoReleaser configuration
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          # either 'goreleaser' (default) or 'goreleaser-pro'
+          distribution: goreleaser
+          # 'latest', 'nightly', or a semver
+          version: "~> v2"
+          args: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
+          # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+
+      - name: Test GoReleaser build (with all package managers)
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          # either 'goreleaser' (default) or 'goreleaser-pro'
+          distribution: goreleaser
+          # 'latest', 'nightly', or a semver
+          version: "~> v2"
+          args: release --snapshot --clean --skip=publish --skip=sign --skip=validate --verbose
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
+          # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+
+      - name: Verify generated artifacts
+        run: |
+          echo "📋 Checking generated artifacts..."
+
+          if [[ -d "dist" ]]; then
+            echo "✅ Distribution directory created"
+
+            # Count different types of artifacts
+            BINARIES=$(find dist -name "emojify*" -type f -executable | wc -l || echo "0")
+            ARCHIVES=$(find dist -name "*.tar.gz" -o -name "*.zip" | wc -l || echo "0")
+            CHECKSUMS=$(find dist -name "checksums.txt" | wc -l || echo "0")
+            SNAPS=$(find dist -name "*.snap" | wc -l || echo "0")
+
+            echo "📊 Artifact Summary:"
+            echo "   Binaries: $BINARIES"
+            echo "   Archives: $ARCHIVES"
+            echo "   Checksums: $CHECKSUMS"
+            echo "   Snaps: $SNAPS"
+
+            echo ""
+            echo "📁 Directory structure:"
+            ls -la dist/ || echo "Cannot list dist directory"
+
+            echo ""
+            echo "🏷️  Generated files (first 20):"
+            find dist -type f | head -20 | sed 's/^/   /'
+
+            echo ""
+            echo "📦 Package manager manifests:"
+            find dist -name "*.rb" -o -name "*.json" -o -name "*.yaml" -o -name "*.yml" | head -10 | sed 's/^/   /'
+
+          else
+            echo "❌ No dist directory found"
+            exit 1
+          fi
+
+      - name: Test package manager configurations
+        run: |
+          echo "🔍 Testing package manager configurations..."
+
+          # Check for Homebrew formula
+          if find dist -name "*.rb" | grep -q .; then
+            echo "✅ Homebrew formula generated"
+            echo "   Files:"
+            find dist -name "*.rb" | sed 's/^/   /'
+          else
+            echo "❌ No Homebrew formula found"
+          fi
+
+          # Check for Chocolatey packages
+          if find dist -name "*chocolatey*" | grep -q .; then
+            echo "✅ Chocolatey package files generated"
+            echo "   Files:"
+            find dist -name "*chocolatey*" | sed 's/^/   /'
+          else
+            echo "⚠️  No Chocolatey package files found"
+          fi
+
+          # Check for WinGet manifests
+          if find dist -name "*winget*" | grep -q .; then
+            echo "✅ WinGet manifest generated"
+            echo "   Files:"
+            find dist -name "*winget*" | sed 's/^/   /'
+          else
+            echo "⚠️  No WinGet manifest found"
+          fi
+
+          # Check for AUR packages
+          if find dist -name "*aur*" | grep -q .; then
+            echo "✅ AUR package generated"
+            echo "   Files:"
+            find dist -name "*aur*" | sed 's/^/   /'
+          else
+            echo "⚠️  No AUR package found"
+          fi
+
+          # Check for Scoop manifests
+          if find dist -name "*scoop*" | grep -q .; then
+            echo "✅ Scoop manifest generated"
+            echo "   Files:"
+            find dist -name "*scoop*" | sed 's/^/   /'
+          else
+            echo "⚠️  No Scoop manifest found"
+          fi
+
+          # Check for Nix packages
+          if find dist -name "*nix*" | grep -q .; then
+            echo "✅ Nix package generated"
+            echo "   Files:"
+            find dist -name "*nix*" | sed 's/^/   /'
+          else
+            echo "⚠️  No Nix package found"
+          fi
+
+          # Check for Snap packages
+          if find dist -name "*.snap" | grep -q .; then
+            echo "✅ Snap package generated"
+            echo "   Files:"
+            find dist -name "*.snap" | sed 's/^/   /'
+          else
+            echo "⚠️  No Snap package found"
+          fi
+
+      - name: Show detailed logs on failure
+        if: failure()
+        run: |
+          echo "❌ GoReleaser test failed!"
+          echo ""
+          echo "🔍 Debugging information:"
+          echo "Working directory: $(pwd)"
+          echo "Available tools:"
+          echo "  - GoReleaser: $(go tool goreleaser --version)"
+          echo "  - Go: $(go version)"
+          echo "  - Git: $(git --version)"
+          echo "  - Snapcraft: $(snapcraft --version 2>/dev/null || echo 'Not available')"
+          echo "  - Mono: $(mono --version 2>/dev/null | head -1 || echo 'Not available')"
+          echo "  - Nix: $(nix --version 2>/dev/null || echo 'Not available')"
+          echo "  - Choco: $(choco --version 2>/dev/null || echo 'Not available')"
+          echo ""
+          echo "Environment variables:"
+          env | grep -E "(GITHUB|CHOCOLATEY|WINGET|AUR)" | sed 's/^/  /'
+          echo ""
+          echo "Current directory contents:"
+          ls -la
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: goreleaser-test-artifacts
+          path: |
+            dist/
+            RELEASE_NOTES.md
+          retention-days: 7
