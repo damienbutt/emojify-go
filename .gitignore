@@ -73,3 +73,6 @@ aur/*/*.tar.gz
 aur/*/*.pkg.tar.*
 aur/*/emojify-go/
 aur/*/emojify-go-*/
+
+# Local test tools
+.local/

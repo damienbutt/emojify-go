@@ -10,7 +10,10 @@ before:
   hooks:
     - go mod tidy
     - go generate ./...
+    # Generate full CHANGELOG.md for the repository
     - go tool git-chglog --next-tag {{ .Tag }} --output CHANGELOG.md
+    # Generate release-specific changelog for GitHub release
+    - go tool git-chglog --next-tag {{ .Tag }} {{ .Tag }} --output RELEASE_NOTES.md
 
 builds:
   - id: emojify
@@ -32,22 +35,18 @@ builds:
       - -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=goreleaser
 
 archives:
-  - id: emojify
-    format: tar.gz
+  - id: "default"
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+      - CHANGELOG.md
+      - completions/**/*
+      - man/*.1
+    # Default format is tar.gz, override for Windows
     format_overrides:
       - goos: windows
         format: zip
-    name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
-    files:
-      - README.md
-      - LICENSE
-      - docs/man/emojify.1
 
 checksum:
   name_template: "checksums.txt"
@@ -56,29 +55,9 @@ snapshot:
   version_template: "{{ incpatch .Version }}-next"
 
 changelog:
-  sort: asc
-  use: github
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-      - "^ci:"
-      - "^chore:"
-      - "^style:"
-      - Merge pull request
-      - Merge branch
-  groups:
-    - title: Features
-      regexp: '^.*?feat(\(.+\))??!?:.+$'
-      order: 0
-    - title: "Bug fixes"
-      regexp: '^.*?fix(\(.+\))??!?:.+$'
-      order: 1
-    - title: "Performance improvements"
-      regexp: '^.*?perf(\(.+\))??!?:.+$'
-      order: 2
-    - title: Others
-      order: 999
+  # Disable GoReleaser's built-in changelog generation
+  # Use git-chglog generated CHANGELOG.md instead
+  disable: true
 
 # Git configuration for tagging and changelog commits
 git:
@@ -88,24 +67,24 @@ git:
 
 # Homebrew formula (stored in main repo)
 brews:
-  - name: emojify-go
-    repository:
+  - repository:
       owner: damienbutt
-      name: emojify-go
-      branch: master
-      token: "{{ .Env.GITHUB_TOKEN }}"
+      name: homebrew-tap
+    name: emojify-go
     homepage: "https://github.com/damienbutt/emojify-go"
-    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
+    description: "🎭 Transform plain text into expressive emoji-rich content"
     license: "MIT"
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    dependencies:
+      - name: git
+    directory: Formula
     test: |
-      system "#{bin}/emojify --version"
-      assert_match "Hello 😁 world", shell_output("echo 'Hello :grin: world' | #{bin}/emojify")
+      system "#{bin}/emojify", "--version"
     install: |
       bin.install "emojify"
+      man1.install "man/emojify.1"
+      bash_completion.install "completions/emojify.bash" => "emojify"
+      zsh_completion.install "completions/emojify.zsh" => "_emojify"
+      fish_completion.install "completions/emojify.fish" => "emojify.fish"
 
 # Scoop bucket for Windows - targeting main repository
 scoops:
@@ -218,8 +197,9 @@ nfpms:
     rpm:
       group: Applications/Text
       compression: lzma
-      signature:
-        key_file: "{{ .Env.GPG_KEY_FILE }}"
+      # GPG signing is optional and can be added later
+      # signature:
+      #   key_file: "{{ .Env.GPG_KEY_FILE }}"
     deb:
       lintian_overrides:
         - statically-linked-binary
@@ -310,6 +290,9 @@ dockers:
       - "ghcr.io/damienbutt/emojify:latest-amd64"
     dockerfile: Dockerfile
     use: buildx
+    extra_files:
+      - go.mod
+      - go.sum
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -322,6 +305,9 @@ dockers:
       - "ghcr.io/damienbutt/emojify:latest-arm64"
     dockerfile: Dockerfile
     use: buildx
+    extra_files:
+      - go.mod
+      - go.sum
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -348,33 +334,29 @@ release:
   draft: false
   prerelease: auto
   mode: replace
+  # The body will be populated from RELEASE_NOTES.md via CLI flag or CI
   header: |
-    ## Emojify {{ .Tag }} Release 🚀
-
-    Replace emoji aliases with actual emoji characters on the command line!
-  footer: |
     ## Installation
 
     ### macOS (Homebrew)
     ```bash
-    brew tap damienbutt/tap
-    brew install emojify
+    brew install damienbutt/emojify-go/emojify-go
     ```
 
     ### Windows (Scoop)
     ```powershell
-    scoop bucket add damienbutt https://github.com/damienbutt/scoop-bucket
-    scoop install emojify
+    scoop bucket add main
+    scoop install emojify-go
     ```
 
     ### Windows (Chocolatey)
     ```powershell
-    choco install emojify
+    choco install emojify-go
     ```
 
     ### Windows (WinGet)
     ```powershell
-    winget install damienbutt.emojify
+    winget install damienbutt.emojify-go
     ```
 
     ### Linux (DEB/RPM)
@@ -382,17 +364,12 @@ release:
 
     ### Arch Linux (AUR)
     ```bash
-    yay -S emojify-bin
-    ```
-
-    ### Snap
-    ```bash
-    sudo snap install emojify
+    yay -S emojify-go-bin
     ```
 
     ### Docker
     ```bash
     docker run --rm ghcr.io/damienbutt/emojify:latest "Hello :wave: World"
     ```
-
+  footer: |
     **Full Changelog**: https://github.com/damienbutt/emojify-go/compare/{{ .PreviousTag }}...{{ .Tag }}

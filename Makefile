@@ -428,10 +428,23 @@ goreleaser-build:
 	@echo "🔨 Building with GoReleaser..."
 	@goreleaser build --snapshot --clean || echo "⚠️  goreleaser not found"
 
+.PHONY: goreleaser-test-release-notes
+goreleaser-test-release-notes:
+	@echo "📝 Testing release notes generation..."
+	@if [ -z "$(VERSION)" ]; then echo "⚠️  VERSION is required. Usage: make goreleaser-test-release-notes VERSION=v1.0.0"; exit 1; fi
+	@echo "📋 Generating release notes for $(VERSION)..."
+	@git-chglog --tag-filter-pattern $(VERSION) --output RELEASE_NOTES.md $(VERSION)
+	@echo "✅ Release notes generated: RELEASE_NOTES.md"
+	@echo "📄 Content preview:"
+	@head -20 RELEASE_NOTES.md
+
 .PHONY: goreleaser-release
 goreleaser-release:
 	@echo "🚀 Creating release with GoReleaser..."
-	@goreleaser release --clean || echo "⚠️  goreleaser not found"
+	@if [ -z "$(VERSION)" ]; then echo "⚠️  VERSION is required. Usage: make goreleaser-release VERSION=v1.0.0"; exit 1; fi
+	@echo "📝 Generating release notes for $(VERSION)..."
+	@git-chglog --tag-filter-pattern $(VERSION) --output RELEASE_NOTES.md $(VERSION)
+	@goreleaser release --clean --release-notes RELEASE_NOTES.md || echo "⚠️  goreleaser not found"
 
 .PHONY: goreleaser-release-with-changelog
 goreleaser-release-with-changelog:
