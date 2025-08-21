@@ -125,15 +125,6 @@ scoops:
       name: goreleaserbot
       email: bot@goreleaser.com
     commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
-    skip_upload: false
-
-  # Local Scoop manifest (maintained in repo)
-  - name: emojify-go
-    directory: package/scoop
-    homepage: "https://github.com/damienbutt/emojify-go"
-    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
-    license: MIT
-    skip_upload: true
 
 # Chocolatey package for Windows
 chocolateys:
@@ -159,27 +150,6 @@ chocolateys:
     release_notes: "https://github.com/damienbutt/emojify-go/releases/tag/v{{ .Version }}"
     api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
     source_repo: "https://push.chocolatey.org/"
-    skip_publish: false
-
-  # Local Chocolatey manifest (maintained in repo)
-  - name: emojify-go
-    title: Emojify-Go
-    directory: package/chocolatey
-    authors: Damien Butt
-    project_url: https://github.com/damienbutt/emojify-go
-    copyright: 2025 Damien Butt
-    license_url: https://github.com/damienbutt/emojify-go/blob/main/LICENSE
-    require_license_acceptance: false
-    project_source_url: https://github.com/damienbutt/emojify-go
-    docs_url: https://github.com/damienbutt/emojify-go/blob/main/README.md
-    bug_tracker_url: https://github.com/damienbutt/emojify-go/issues
-    tags: "emojify-go emoji cli golang unicode converter terminal shell productivity"
-    summary: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
-    description: |
-      emojify-go is a lightning-fast, cross-platform command-line tool for bidirectional emoji conversion.
-      Convert between emoji aliases (:smile:) and Unicode emoji characters (😄) seamlessly.
-      This is a complete Go rewrite with 169.9x better performance.
-    skip_publish: true
 
 # WinGet package for Windows
 winget:
