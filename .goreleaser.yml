@@ -42,11 +42,7 @@ archives:
       - README.md
       - CHANGELOG.md
       - completions/**/*
-      - man/*.1
-    # Default format is tar.gz, override for Windows
-    format_overrides:
-      - goos: windows
-        format: zip
+      - docs/man/*.1
 
 checksum:
   name_template: "checksums.txt"
@@ -66,7 +62,7 @@ git:
     - "nightly"
 
 # Homebrew formula (stored in main repo)
-brews:
+homebrew_casks:
   - repository:
       owner: damienbutt
       name: homebrew-tap
@@ -74,17 +70,14 @@ brews:
     homepage: "https://github.com/damienbutt/emojify-go"
     description: "🎭 Transform plain text into expressive emoji-rich content"
     license: "MIT"
-    dependencies:
-      - name: git
-    directory: Formula
-    test: |
-      system "#{bin}/emojify", "--version"
-    install: |
-      bin.install "emojify"
-      man1.install "man/emojify.1"
-      bash_completion.install "completions/emojify.bash" => "emojify"
-      zsh_completion.install "completions/emojify.zsh" => "_emojify"
-      fish_completion.install "completions/emojify.fish" => "emojify.fish"
+    directory: Casks
+    binary: emojify
+    manpages:
+      - docs/man/emojify.1
+    completions:
+      bash: completions/emojify.bash
+      zsh: completions/emojify.zsh
+      fish: completions/emojify.fish
 
 # Scoop bucket for Windows - targeting main repository
 scoops:
