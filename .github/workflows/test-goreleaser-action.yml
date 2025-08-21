@@ -58,13 +58,11 @@ jobs:
             BINARIES=$(find dist -name "emojify*" -type f -executable | wc -l || echo "0")
             ARCHIVES=$(find dist -name "*.tar.gz" -o -name "*.zip" | wc -l || echo "0")
             CHECKSUMS=$(find dist -name "checksums.txt" | wc -l || echo "0")
-            SNAPS=$(find dist -name "*.snap" | wc -l || echo "0")
 
             echo "📊 Artifact Summary:"
             echo "   Binaries: $BINARIES"
             echo "   Archives: $ARCHIVES"
             echo "   Checksums: $CHECKSUMS"
-            echo "   Snaps: $SNAPS"
 
             echo ""
             echo "📁 Directory structure:"
@@ -96,24 +94,6 @@ jobs:
             echo "❌ No Homebrew formula found"
           fi
 
-          # Check for Chocolatey packages
-          if find dist -name "*chocolatey*" | grep -q .; then
-            echo "✅ Chocolatey package files generated"
-            echo "   Files:"
-            find dist -name "*chocolatey*" | sed 's/^/   /'
-          else
-            echo "⚠️  No Chocolatey package files found"
-          fi
-
-          # Check for WinGet manifests
-          if find dist -name "*winget*" | grep -q .; then
-            echo "✅ WinGet manifest generated"
-            echo "   Files:"
-            find dist -name "*winget*" | sed 's/^/   /'
-          else
-            echo "⚠️  No WinGet manifest found"
-          fi
-
           # Check for AUR packages
           if find dist -name "*aur*" | grep -q .; then
             echo "✅ AUR package generated"
@@ -132,24 +112,6 @@ jobs:
             echo "⚠️  No Scoop manifest found"
           fi
 
-          # Check for Nix packages
-          if find dist -name "*nix*" | grep -q .; then
-            echo "✅ Nix package generated"
-            echo "   Files:"
-            find dist -name "*nix*" | sed 's/^/   /'
-          else
-            echo "⚠️  No Nix package found"
-          fi
-
-          # Check for Snap packages
-          if find dist -name "*.snap" | grep -q .; then
-            echo "✅ Snap package generated"
-            echo "   Files:"
-            find dist -name "*.snap" | sed 's/^/   /'
-          else
-            echo "⚠️  No Snap package found"
-          fi
-
       - name: Show detailed logs on failure
         if: failure()
         run: |
@@ -161,13 +123,9 @@ jobs:
           echo "  - GoReleaser: $(go tool goreleaser --version)"
           echo "  - Go: $(go version)"
           echo "  - Git: $(git --version)"
-          echo "  - Snapcraft: $(snapcraft --version 2>/dev/null || echo 'Not available')"
-          echo "  - Mono: $(mono --version 2>/dev/null | head -1 || echo 'Not available')"
-          echo "  - Nix: $(nix --version 2>/dev/null || echo 'Not available')"
-          echo "  - Choco: $(choco --version 2>/dev/null || echo 'Not available')"
           echo ""
           echo "Environment variables:"
-          env | grep -E "(GITHUB|CHOCOLATEY|WINGET|AUR)" | sed 's/^/  /'
+          env | grep -E "(GITHUB|AUR)" | sed 's/^/  /'
           echo ""
           echo "Current directory contents:"
           ls -la

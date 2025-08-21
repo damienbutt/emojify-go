@@ -1,0 +1,80 @@
+# Example: Multi-runner release workflow (for reference only)
+# This shows how to handle multiple runners properly to avoid duplicate releases
+
+name: Release (Multi-Runner Example)
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  # PRIMARY JOB: Creates the GitHub release and most packages
+  release-primary:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      upload_url: ${{ steps.release.outputs.upload_url }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install dependencies
+        run: |
+          sudo snap install snapcraft --classic
+
+      - name: Get version
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Primary release (creates GitHub release)
+        id: release
+        run: |
+          # This creates the GitHub release, changelog, and most packages
+          goreleaser release --skip=chocolatey,winget
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # SECONDARY JOB: Only builds Windows packages (no release creation)
+  release-windows:
+    runs-on: windows-latest
+    needs: release-primary
+    if: always() && needs.release-primary.result == 'success'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install Chocolatey CLI
+        run: |
+          # Install choco CLI for packaging
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        shell: powershell
+
+      - name: Build Windows packages only
+        run: |
+          # This ONLY builds packages, doesn't create/modify the GitHub release
+          goreleaser release \
+            --skip=publish \
+            --skip=announce \
+            --skip=homebrew,scoop,snap,nfpm,aur
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Windows packages to existing release
+        run: |
+          # Upload the built packages to the existing release
+          # (This would require additional scripting to attach to the existing release)
+          echo "Would upload to release: ${{ needs.release-primary.outputs.upload_url }}"

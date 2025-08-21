@@ -96,56 +96,6 @@ scoops:
       email: bot@goreleaser.com
     commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
 
-# Chocolatey package for Windows
-chocolateys:
-  - name: emojify-go
-    title: Emojify-Go
-    authors: Damien Butt
-    project_url: https://github.com/damienbutt/emojify-go
-    url_template: "https://github.com/damienbutt/emojify-go/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    icon_url: "https://raw.githubusercontent.com/damienbutt/emojify-go/main/img/emojify-icon.png"
-    copyright: 2025 Damien Butt
-    license_url: https://github.com/damienbutt/emojify-go/blob/main/LICENSE
-    require_license_acceptance: false
-    project_source_url: https://github.com/damienbutt/emojify-go
-    docs_url: https://github.com/damienbutt/emojify-go/blob/main/README.md
-    bug_tracker_url: https://github.com/damienbutt/emojify-go/issues
-    tags: "emoji cli command-line text-processing golang"
-    summary: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis
-    description: |
-      {{ .ProjectName }} is a lightning-fast Go rewrite of the original emojify bash script.
-      It replaces emoji aliases (like :grin:) with actual emoji characters with 169.9x
-      better performance. Perfect for processing git logs, documentation, and any text
-      containing emoji aliases.
-    release_notes: "https://github.com/damienbutt/emojify-go/releases/tag/v{{ .Version }}"
-    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
-    source_repo: "https://push.chocolatey.org/"
-
-# WinGet package for Windows
-winget:
-  - name: emojify-go
-    publisher: damienbutt
-    license: MIT
-    homepage: https://github.com/damienbutt/emojify-go
-    short_description: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis
-    description: |
-      Emojify-Go is a lightning-fast Go rewrite of the original emojify bash script.
-      It replaces emoji aliases (like :grin:) with actual emoji characters with 169.9x
-      better performance. Perfect for processing git logs, documentation, and any text
-      containing emoji aliases.
-    repository:
-      owner: damienbutt
-      name: winget-pkgs
-      branch: emojify-go-{{.Version}}
-      token: "{{ .Env.WINGET_GITHUB_TOKEN }}"
-      pull_request:
-        enabled: true
-        draft: false
-        base:
-          owner: microsoft
-          name: winget-pkgs
-          branch: master
-
 # Linux packages
 nfpms:
   - id: packages
@@ -198,40 +148,9 @@ nfpms:
         - statically-linked-binary
         - changelog-file-missing-in-native-package
 
-# Snapcraft
-snapcrafts:
-  - name: emojify-go
-    publish: true
-    summary: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis
-    description: |
-      Emojify-Go is a lightning-fast Go rewrite of the original emojify bash script
-      with 169.9x better performance. It replaces emoji aliases (like :grin:) with
-      actual emoji characters. Perfect for processing git logs, documentation, and
-      any text containing emoji aliases.
-
-      Features:
-      - 169.9x faster than original bash version
-      - Support for 2500+ emojis
-      - Pipeline-friendly
-      - Cross-platform compatibility
-      - Zero dependencies
-    grade: stable
-    confinement: strict
-    license: MIT
-    base: core22
-    channel_templates:
-      - edge
-      - beta
-      - candidate
-      - stable
-    apps:
-      emojify:
-        command: emojify
-        plugs: ["home", "removable-media"]
-
 # AUR packages
 aurs:
-  # Binary package (pre-built binary) - GoReleaser only supports binary packages
+  # Binary package (pre-built binary)
   - name: emojify-go-bin
     homepage: https://github.com/damienbutt/emojify-go
     description: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis (binary)
@@ -256,21 +175,66 @@ aurs:
       email: bot@goreleaser.com
     skip_upload: false
 
-# Note: emojify-go (source package) must be created manually on AUR
-# GoReleaser only supports binary AUR packages
-
-# Nix packages
-nix:
+# AUR source packages
+aur_sources:
+  # Source package (builds from source)
   - name: emojify-go
-    repository:
-      owner: damienbutt
-      name: nur-packages
-      branch: master
-      token: "{{ .Env.GITHUB_TOKEN }}"
-    homepage: "https://github.com/damienbutt/emojify-go"
-    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
-    license: "mit"
-    path: pkgs/emojify-go/default.nix
+    homepage: https://github.com/damienbutt/emojify-go
+    description: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis
+    maintainers:
+      - "Damien Butt <damien at example dot com>"
+    license: MIT
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: "ssh://aur@aur.archlinux.org/emojify-go.git"
+    depends:
+      - glibc
+    makedepends:
+      - go
+      - git
+    prepare: |-
+      cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
+
+      # Set up Go environment for reproducible builds
+      export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
+      export CGO_ENABLED=0
+
+      # Download dependencies
+      go mod download
+    build: |-
+      cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
+
+      # Build the binary with proper flags
+      export CGO_ENABLED=0
+      export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
+      export LDFLAGS="-linkmode=external -extldflags \"${LDFLAGS}\""
+
+      go build \
+        -ldflags="-s -w -X github.com/damienbutt/emojify-go/internal/version.Version={{ .Version }} -X github.com/damienbutt/emojify-go/internal/version.Commit={{ .Commit }} -X github.com/damienbutt/emojify-go/internal/version.Date={{ .Date }} -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=makepkg ${LDFLAGS}" \
+        -o emojify \
+        ./cmd/emojify
+    package: |-
+      cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
+
+      # Install binary
+      install -Dm755 emojify "${pkgdir}/usr/bin/emojify"
+
+      # Install license
+      install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+      # Install documentation
+      install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+
+      # Install man page if available
+      if [[ -f docs/man/emojify.1 ]]; then
+        install -Dm644 docs/man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
+      fi
+
+      # Install shell completions if available
+      if [[ -d completions ]]; then
+        install -Dm644 completions/emojify.bash "${pkgdir}/usr/share/bash-completion/completions/emojify"
+        install -Dm644 completions/emojify.zsh "${pkgdir}/usr/share/zsh/site-functions/_emojify"
+        install -Dm644 completions/emojify.fish "${pkgdir}/usr/share/fish/vendor_completions.d/emojify.fish"
+      fi
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
@@ -340,16 +304,6 @@ release:
     ```powershell
     scoop bucket add main
     scoop install emojify-go
-    ```
-
-    ### Windows (Chocolatey)
-    ```powershell
-    choco install emojify-go
-    ```
-
-    ### Windows (WinGet)
-    ```powershell
-    winget install damienbutt.emojify-go
     ```
 
     ### Linux (DEB/RPM)

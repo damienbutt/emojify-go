@@ -43,47 +43,6 @@ jobs:
       #   with:
       #     install-only: true
 
-      # - name: Install system dependencies for packaging
-      #   run: |
-      #     echo "📦 Installing packaging dependencies..."
-
-      #     # Update package lists
-      #     sudo apt-get update -qq
-
-      #     # Install snapcraft for snap packaging
-      #     sudo snap install snapcraft --classic
-
-      #     # Install Mono for Chocolatey CLI support
-      #     sudo apt-get install -y mono-complete
-
-      #     # Install Nix for nix packaging
-      #     curl -L https://nixos.org/nix/install | sh -s -- --yes
-      #     . ~/.nix-profile/etc/profile.d/nix.sh
-
-      #     # Add nix to PATH for this session
-      #     echo "$HOME/.nix-profile/bin" >> $GITHUB_PATH
-
-      #     # Install Chocolatey CLI
-      #     TEMP_DIR=$(mktemp -d)
-      #     cd "$TEMP_DIR"
-      #     curl -sSL "https://github.com/chocolatey/choco/releases/download/2.5.0/chocolatey.v2.5.0.tar.gz" -o choco.tar.gz
-      #     tar -xzf choco.tar.gz
-      #     sudo cp choco.exe /usr/local/bin/
-
-      #     # Create chocolatey wrapper script
-      #     sudo tee /usr/local/bin/choco > /dev/null << 'EOF'
-      #     #!/bin/bash
-      #     exec mono /usr/local/bin/choco.exe "$@"
-      #     EOF
-      #     sudo chmod +x /usr/local/bin/choco
-
-      #     # Verify installations
-      #     echo "🔍 Verifying tool installations:"
-      #     echo "Snapcraft: $(snap --version | head -1)"
-      #     echo "Mono: $(mono --version | head -1)"
-      #     echo "Nix: $(nix --version || echo 'Not available yet')"
-      #     echo "Choco: $(choco --version || echo 'Not available')"
-
       - name: Verify GoReleaser configuration
         run: |
           echo "🧪 Validating GoReleaser configuration..."
@@ -98,11 +57,26 @@ jobs:
       #     echo "WINGET_GITHUB_TOKEN=dummy-for-testing" >> $GITHUB_ENV
       #     echo "AUR_KEY=dummy-for-testing" >> $GITHUB_ENV
 
-      - name: Test GoReleaser build (with all package managers)
+      - name: Test GoReleaser build (with core package managers)
         run: |
-          echo "🚀 Testing GoReleaser with ALL package managers enabled..."
-          echo "This is a dry-run test with no skipping of any components."
-          echo
+          echo "🚀 Testing GoReleaser with core package managers enabled..."
+          echo "This is a dry-run test with reliable, cross-platform package managers only."
+          echo ""
+          echo "📋 What this tests:"
+          echo "  ✅ GitHub release creation and changelog generation"
+          echo "  ✅ Archives (tar.gz, zip)"
+          echo "  ✅ Linux packages (deb, rpm, apk, arch)"
+          echo "  ✅ Homebrew formula generation"
+          echo "  ✅ Scoop manifest generation"
+          echo "  ✅ AUR packages (binary and source)"
+          echo "  ✅ Docker images"
+          echo ""
+          echo "📝 Removed for simplicity and reliability:"
+          echo "  ❌ Snap packages (requires snapcraft installation)"
+          echo "  ❌ Chocolatey (requires Windows runner and choco CLI)"
+          echo "  ❌ WinGet (requires Windows runner and complex setup)"
+          echo "  ❌ Nix packages (requires nix installation)"
+          echo ""
 
           # Enable verbose mode if requested
           VERBOSE_FLAGS=""
@@ -111,8 +85,7 @@ jobs:
             echo "🐛 Verbose mode enabled"
           fi
 
-          # Run GoReleaser with minimal skipping (only publish and sign)
-          # This will test ALL package manager configurations
+          # Run GoReleaser with minimal skipping - now much simpler!
           go tool goreleaser release \
             --snapshot \
             --clean \
