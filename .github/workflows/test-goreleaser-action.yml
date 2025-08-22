@@ -1,4 +1,4 @@
-name: Test GoReleaser (Manual)
+name: Test GoReleaser-Action (Manual)
 
 on:
   workflow_dispatch:

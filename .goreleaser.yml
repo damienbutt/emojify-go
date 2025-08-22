@@ -1,30 +1,16 @@
-# GoReleaser configuration for emojify-go
 version: 2
-
-project_name: emojify-go
-
-# Output directory for artifacts
-dist: dist
 
 before:
   hooks:
-    - go mod tidy
+    - make clean
     - go generate ./...
-    # Generate full CHANGELOG.md for the repository
-    - go tool git-chglog --next-tag {{ .Tag }} --output CHANGELOG.md
-    # Generate release-specific changelog for GitHub release
-    - go tool git-chglog --next-tag {{ .Tag }} {{ .Tag }} --output RELEASE_NOTES.md
+    - go mod tidy
 
 builds:
-  - id: emojify
-    main: ./cmd/emojify
+  - main: ./cmd/emojify
     binary: emojify
     env:
       - CGO_ENABLED=0
-    goos:
-      - linux
-      - windows
-      - darwin
     goarch:
       - amd64
       - arm64
@@ -35,14 +21,12 @@ builds:
       - -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=goreleaser
 
 archives:
-  - id: "default"
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    files:
+  - files:
       - LICENSE
       - README.md
-      - CHANGELOG.md
-      - completions/**/*
+      # - CHANGELOG.md
       - docs/man/*.1
+    formats: ["zip", "tar.gz"]
 
 checksum:
   name_template: "checksums.txt"
@@ -51,64 +35,14 @@ snapshot:
   version_template: "{{ incpatch .Version }}-next"
 
 changelog:
-  # Disable GoReleaser's built-in changelog generation
-  # Use git-chglog generated CHANGELOG.md instead
   disable: true
 
-# Git configuration for tagging and changelog commits
 git:
-  tag_sort: -version:refname
   ignore_tags:
     - "nightly"
 
-# Homebrew formula (stored in main repo)
-homebrew_casks:
-  - repository:
-      owner: damienbutt
-      name: homebrew-tap
-    name: emojify-go
-    homepage: "https://github.com/damienbutt/emojify-go"
-    description: "🎭 Transform plain text into expressive emoji-rich content"
-    license: "MIT"
-    directory: Casks
-    binary: emojify
-    manpages:
-      - docs/man/emojify.1
-    completions:
-      bash: completions/emojify.bash
-      zsh: completions/emojify.zsh
-      fish: completions/emojify.fish
-
-# Scoop bucket for Windows - targeting main repository
-scoops:
-  - name: emojify-go
-    repository:
-      owner: ScoopInstaller
-      name: Main
-      branch: master
-      token: "{{ .Env.GITHUB_TOKEN }}"
-    url_template: "https://github.com/damienbutt/emojify-go/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    homepage: "https://github.com/damienbutt/emojify-go"
-    description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
-    license: MIT
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
-
-# Linux packages
 nfpms:
-  - id: packages
-    package_name: emojify-go
-    file_name_template: "{{ .ConventionalFileName }}"
-    vendor: Damien Butt
-    homepage: https://github.com/damienbutt/emojify-go
-    maintainer: Damien Butt <damien@example.com>
-    description: |-
-      Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis.
-      Emojify-Go is a lightning-fast Go rewrite of the original emojify bash script
-      with 169.9x better performance.
-    license: MIT
+  - maintainer: Damien Butt <22627489+damienbutt@users.noreply.github.com>
     formats:
       - apk
       - deb
@@ -121,10 +55,8 @@ nfpms:
     suggests:
       - zsh
       - bash
-    bindir: /usr/bin
     section: utils
     priority: optional
-    meta: true
     contents:
       - src: ./LICENSE
         dst: /usr/share/doc/emojify/LICENSE
@@ -140,177 +72,323 @@ nfpms:
     rpm:
       group: Applications/Text
       compression: lzma
-      # GPG signing is optional and can be added later
-      # signature:
-      #   key_file: "{{ .Env.GPG_KEY_FILE }}"
     deb:
       lintian_overrides:
         - statically-linked-binary
         - changelog-file-missing-in-native-package
+# GoReleaser configuration for emojify-go
+# version: 2
 
-# AUR packages
-aurs:
-  # Binary package (pre-built binary)
-  - name: emojify-go-bin
-    homepage: https://github.com/damienbutt/emojify-go
-    description: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis (binary)
-    maintainers:
-      - "Damien Butt <damien at example dot com>"
-    license: MIT
-    private_key: "{{ .Env.AUR_KEY }}"
-    git_url: "ssh://aur@aur.archlinux.org/emojify-go-bin.git"
-    depends:
-      - glibc
-    package: |-
-      # bin
-      install -Dm755 "./emojify" "${pkgdir}/usr/bin/emojify"
+# project_name: emojify-go
 
-      # license
-      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/emojify-go/LICENSE"
+# # Output directory for artifacts
+# dist: dist
 
-      # documentation
-      install -Dm644 "./README.md" "${pkgdir}/usr/share/doc/emojify-go/README.md"
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    skip_upload: false
+# before:
+#   hooks:
+#     - go mod tidy
+#     - go generate ./...
+#     # Generate full CHANGELOG.md for the repository
+#     - go tool git-chglog --next-tag {{ .Tag }} --output CHANGELOG.md
+#     # Generate release-specific changelog for GitHub release
+#     - go tool git-chglog --next-tag {{ .Tag }} {{ .Tag }} --output RELEASE_NOTES.md
 
-# AUR source packages
-# aur_sources:
-#   # Source package (builds from source)
+# builds:
+#   - id: emojify
+#     main: ./cmd/emojify
+#     binary: emojify
+#     env:
+#       - CGO_ENABLED=0
+#     goos:
+#       - linux
+#       - windows
+#       - darwin
+#     goarch:
+#       - amd64
+#       - arm64
+#     ldflags:
+#       - -s -w -X github.com/damienbutt/emojify-go/internal/version.Version={{.Version}}
+#       - -X github.com/damienbutt/emojify-go/internal/version.Commit={{.Commit}}
+#       - -X github.com/damienbutt/emojify-go/internal/version.Date={{.Date}}
+#       - -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=goreleaser
+
+# archives:
+#   - id: "default"
+#     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+#     files:
+#       - LICENSE
+#       - README.md
+#       - CHANGELOG.md
+#       - completions/**/*
+#       - docs/man/*.1
+
+# checksum:
+#   name_template: "checksums.txt"
+
+# snapshot:
+#   version_template: "{{ incpatch .Version }}-next"
+
+# changelog:
+#   # Disable GoReleaser's built-in changelog generation
+#   # Use git-chglog generated CHANGELOG.md instead
+#   disable: true
+
+# # Git configuration for tagging and changelog commits
+# git:
+#   tag_sort: -version:refname
+#   ignore_tags:
+#     - "nightly"
+
+# # Homebrew formula (stored in main repo)
+# homebrew_casks:
+#   - repository:
+#       owner: damienbutt
+#       name: homebrew-tap
+#     name: emojify-go
+#     homepage: "https://github.com/damienbutt/emojify-go"
+#     description: "🎭 Transform plain text into expressive emoji-rich content"
+#     license: "MIT"
+#     directory: Casks
+#     binary: emojify
+#     manpages:
+#       - docs/man/emojify.1
+#     completions:
+#       bash: completions/emojify.bash
+#       zsh: completions/emojify.zsh
+#       fish: completions/emojify.fish
+
+# # Scoop bucket for Windows - targeting main repository
+# scoops:
 #   - name: emojify-go
+#     repository:
+#       owner: ScoopInstaller
+#       name: Main
+#       branch: master
+#       token: "{{ .Env.GITHUB_TOKEN }}"
+#     url_template: "https://github.com/damienbutt/emojify-go/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#     homepage: "https://github.com/damienbutt/emojify-go"
+#     description: "Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis"
+#     license: MIT
+#     commit_author:
+#       name: goreleaserbot
+#       email: bot@goreleaser.com
+#     commit_msg_template: "Scoop update for {{ .ProjectName }} version {{ .Tag }}"
+
+# # Linux packages
+# nfpms:
+#   - id: packages
+#     package_name: emojify-go
+#     file_name_template: "{{ .ConventionalFileName }}"
+#     vendor: Damien Butt
 #     homepage: https://github.com/damienbutt/emojify-go
-#     description: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis
+#     maintainer: Damien Butt <damien@example.com>
+#     description: |-
+#       Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis.
+#       Emojify-Go is a lightning-fast Go rewrite of the original emojify bash script
+#       with 169.9x better performance.
+#     license: MIT
+#     formats:
+#       - apk
+#       - deb
+#       - rpm
+#       - archlinux
+#     dependencies:
+#       - git
+#     recommends:
+#       - less
+#     suggests:
+#       - zsh
+#       - bash
+#     bindir: /usr/bin
+#     section: utils
+#     priority: optional
+#     meta: true
+#     contents:
+#       - src: ./LICENSE
+#         dst: /usr/share/doc/emojify/LICENSE
+#         file_info:
+#           mode: 0644
+#       - src: ./README.md
+#         dst: /usr/share/doc/emojify/README.md
+#         file_info:
+#           mode: 0644
+#     scripts:
+#       postinstall: "scripts/postinstall.sh"
+#       preremove: "scripts/preremove.sh"
+#     rpm:
+#       group: Applications/Text
+#       compression: lzma
+#       # GPG signing is optional and can be added later
+#       # signature:
+#       #   key_file: "{{ .Env.GPG_KEY_FILE }}"
+#     deb:
+#       lintian_overrides:
+#         - statically-linked-binary
+#         - changelog-file-missing-in-native-package
+
+# # AUR packages
+# aurs:
+#   # Binary package (pre-built binary)
+#   - name: emojify-go-bin
+#     homepage: https://github.com/damienbutt/emojify-go
+#     description: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis (binary)
 #     maintainers:
 #       - "Damien Butt <damien at example dot com>"
 #     license: MIT
 #     private_key: "{{ .Env.AUR_KEY }}"
-#     git_url: "ssh://aur@aur.archlinux.org/emojify-go.git"
+#     git_url: "ssh://aur@aur.archlinux.org/emojify-go-bin.git"
 #     depends:
 #       - glibc
-#     makedepends:
-#       - go
-#       - git
-#     prepare: |-
-#       cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
-
-#       # Set up Go environment for reproducible builds
-#       export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
-#       export CGO_ENABLED=0
-
-#       # Download dependencies
-#       go mod download
-#     build: |-
-#       cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
-
-#       # Build the binary with proper flags
-#       export CGO_ENABLED=0
-#       export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
-#       export LDFLAGS="-linkmode=external -extldflags \"${LDFLAGS}\""
-
-#       go build \
-#         -ldflags="-s -w -X github.com/damienbutt/emojify-go/internal/version.Version={{ .Version }} -X github.com/damienbutt/emojify-go/internal/version.Commit={{ .Commit }} -X github.com/damienbutt/emojify-go/internal/version.Date={{ .Date }} -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=makepkg ${LDFLAGS}" \
-#         -o emojify \
-#         ./cmd/emojify
 #     package: |-
-#       cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
+#       # bin
+#       install -Dm755 "./emojify" "${pkgdir}/usr/bin/emojify"
 
-#       # Install binary
-#       install -Dm755 emojify "${pkgdir}/usr/bin/emojify"
+#       # license
+#       install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/emojify-go/LICENSE"
 
-#       # Install license
-#       install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-
-#       # Install documentation
-#       install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
-
-#       # Install man page if available
-#       if [[ -f docs/man/emojify.1 ]]; then
-#         install -Dm644 docs/man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
-#       fi
-
-#       # Install shell completions if available
-#       if [[ -d completions ]]; then
-#         install -Dm644 completions/emojify.bash "${pkgdir}/usr/share/bash-completion/completions/emojify"
-#         install -Dm644 completions/emojify.zsh "${pkgdir}/usr/share/zsh/site-functions/_emojify"
-#         install -Dm644 completions/emojify.fish "${pkgdir}/usr/share/fish/vendor_completions.d/emojify.fish"
-#       fi
+#       # documentation
+#       install -Dm644 "./README.md" "${pkgdir}/usr/share/doc/emojify-go/README.md"
 #     commit_author:
 #       name: goreleaserbot
 #       email: bot@goreleaser.com
 #     skip_upload: false
 
-# Docker images
-dockers:
-  - image_templates:
-      - "ghcr.io/damienbutt/emojify:{{ .Version }}-amd64"
-      - "ghcr.io/damienbutt/emojify:latest-amd64"
-    dockerfile: Dockerfile.goreleaser
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--platform=linux/amd64"
-  - image_templates:
-      - "ghcr.io/damienbutt/emojify:{{ .Version }}-arm64"
-      - "ghcr.io/damienbutt/emojify:latest-arm64"
-    dockerfile: Dockerfile.goreleaser
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--platform=linux/arm64"
-    goarch: arm64
+# # AUR source packages
+# # aur_sources:
+# #   # Source package (builds from source)
+# #   - name: emojify-go
+# #     homepage: https://github.com/damienbutt/emojify-go
+# #     description: Lightning-fast Go rewrite of emojify - convert emoji aliases to Unicode emojis
+# #     maintainers:
+# #       - "Damien Butt <damien at example dot com>"
+# #     license: MIT
+# #     private_key: "{{ .Env.AUR_KEY }}"
+# #     git_url: "ssh://aur@aur.archlinux.org/emojify-go.git"
+# #     depends:
+# #       - glibc
+# #     makedepends:
+# #       - go
+# #       - git
+# #     prepare: |-
+# #       cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
 
-docker_manifests:
-  - name_template: "ghcr.io/damienbutt/emojify:{{ .Version }}"
-    image_templates:
-      - "ghcr.io/damienbutt/emojify:{{ .Version }}-amd64"
-      - "ghcr.io/damienbutt/emojify:{{ .Version }}-arm64"
-  - name_template: "ghcr.io/damienbutt/emojify:latest"
-    image_templates:
-      - "ghcr.io/damienbutt/emojify:latest-amd64"
-      - "ghcr.io/damienbutt/emojify:latest-arm64"
+# #       # Set up Go environment for reproducible builds
+# #       export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
+# #       export CGO_ENABLED=0
 
-release:
-  github:
-    owner: damienbutt
-    name: emojify
-  draft: false
-  prerelease: auto
-  mode: replace
-  # The body will be populated from RELEASE_NOTES.md via CLI flag or CI
-  header: |
-    ## Installation
+# #       # Download dependencies
+# #       go mod download
+# #     build: |-
+# #       cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
 
-    ### macOS (Homebrew)
-    ```bash
-    brew install damienbutt/emojify-go/emojify-go
-    ```
+# #       # Build the binary with proper flags
+# #       export CGO_ENABLED=0
+# #       export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
+# #       export LDFLAGS="-linkmode=external -extldflags \"${LDFLAGS}\""
 
-    ### Windows (Scoop)
-    ```powershell
-    scoop bucket add main
-    scoop install emojify-go
-    ```
+# #       go build \
+# #         -ldflags="-s -w -X github.com/damienbutt/emojify-go/internal/version.Version={{ .Version }} -X github.com/damienbutt/emojify-go/internal/version.Commit={{ .Commit }} -X github.com/damienbutt/emojify-go/internal/version.Date={{ .Date }} -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=makepkg ${LDFLAGS}" \
+# #         -o emojify \
+# #         ./cmd/emojify
+# #     package: |-
+# #       cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
 
-    ### Linux (DEB/RPM)
-    Download the appropriate package from the release assets.
+# #       # Install binary
+# #       install -Dm755 emojify "${pkgdir}/usr/bin/emojify"
 
-    ### Arch Linux (AUR)
-    ```bash
-    yay -S emojify-go-bin
-    ```
+# #       # Install license
+# #       install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
-    ### Docker
-    ```bash
-    docker run --rm ghcr.io/damienbutt/emojify:latest "Hello :wave: World"
-    ```
-  footer: |
-    **Full Changelog**: https://github.com/damienbutt/emojify-go/compare/{{ .PreviousTag }}...{{ .Tag }}
+# #       # Install documentation
+# #       install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+
+# #       # Install man page if available
+# #       if [[ -f docs/man/emojify.1 ]]; then
+# #         install -Dm644 docs/man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
+# #       fi
+
+# #       # Install shell completions if available
+# #       if [[ -d completions ]]; then
+# #         install -Dm644 completions/emojify.bash "${pkgdir}/usr/share/bash-completion/completions/emojify"
+# #         install -Dm644 completions/emojify.zsh "${pkgdir}/usr/share/zsh/site-functions/_emojify"
+# #         install -Dm644 completions/emojify.fish "${pkgdir}/usr/share/fish/vendor_completions.d/emojify.fish"
+# #       fi
+# #     commit_author:
+# #       name: goreleaserbot
+# #       email: bot@goreleaser.com
+# #     skip_upload: false
+
+# # Docker images
+# dockers:
+#   - image_templates:
+#       - "ghcr.io/damienbutt/emojify:{{ .Version }}-amd64"
+#       - "ghcr.io/damienbutt/emojify:latest-amd64"
+#     dockerfile: Dockerfile.goreleaser
+#     use: buildx
+#     build_flag_templates:
+#       - "--pull"
+#       - "--label=org.opencontainers.image.created={{.Date}}"
+#       - "--label=org.opencontainers.image.title={{.ProjectName}}"
+#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#       - "--label=org.opencontainers.image.version={{.Version}}"
+#       - "--platform=linux/amd64"
+#   - image_templates:
+#       - "ghcr.io/damienbutt/emojify:{{ .Version }}-arm64"
+#       - "ghcr.io/damienbutt/emojify:latest-arm64"
+#     dockerfile: Dockerfile.goreleaser
+#     use: buildx
+#     build_flag_templates:
+#       - "--pull"
+#       - "--label=org.opencontainers.image.created={{.Date}}"
+#       - "--label=org.opencontainers.image.title={{.ProjectName}}"
+#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#       - "--label=org.opencontainers.image.version={{.Version}}"
+#       - "--platform=linux/arm64"
+#     goarch: arm64
+
+# docker_manifests:
+#   - name_template: "ghcr.io/damienbutt/emojify:{{ .Version }}"
+#     image_templates:
+#       - "ghcr.io/damienbutt/emojify:{{ .Version }}-amd64"
+#       - "ghcr.io/damienbutt/emojify:{{ .Version }}-arm64"
+#   - name_template: "ghcr.io/damienbutt/emojify:latest"
+#     image_templates:
+#       - "ghcr.io/damienbutt/emojify:latest-amd64"
+#       - "ghcr.io/damienbutt/emojify:latest-arm64"
+
+# release:
+#   github:
+#     owner: damienbutt
+#     name: emojify
+#   draft: false
+#   prerelease: auto
+#   mode: replace
+#   # The body will be populated from RELEASE_NOTES.md via CLI flag or CI
+#   header: |
+#     ## Installation
+
+#     ### macOS (Homebrew)
+#     ```bash
+#     brew install damienbutt/emojify-go/emojify-go
+#     ```
+
+#     ### Windows (Scoop)
+#     ```powershell
+#     scoop bucket add main
+#     scoop install emojify-go
+#     ```
+
+#     ### Linux (DEB/RPM)
+#     Download the appropriate package from the release assets.
+
+#     ### Arch Linux (AUR)
+#     ```bash
+#     yay -S emojify-go-bin
+#     ```
+
+#     ### Docker
+#     ```bash
+#     docker run --rm ghcr.io/damienbutt/emojify:latest "Hello :wave: World"
+#     ```
+#   footer: |
+#     **Full Changelog**: https://github.com/damienbutt/emojify-go/compare/{{ .PreviousTag }}...{{ .Tag }}
