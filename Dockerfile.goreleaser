@@ -1,0 +1,19 @@
+# Dockerfile for GoReleaser
+# GoReleaser will use this to build container images with pre-built binaries
+
+# Get certificates and timezone data from Alpine
+FROM alpine:latest AS certs
+RUN apk --no-cache add ca-certificates tzdata
+
+# Final minimal image
+FROM scratch
+
+# Copy certificates and timezone data
+COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=certs /usr/share/zoneinfo /usr/share/zoneinfo
+
+# Copy the binary (GoReleaser will provide this)
+COPY emojify /emojify
+
+# Set the binary as entrypoint
+ENTRYPOINT ["/emojify"]
