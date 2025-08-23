@@ -15,6 +15,8 @@ fi
 # Check if CHANGELOG.md has changes
 if [[ -n "$(git status --porcelain CHANGELOG.md)" ]]; then
     echo "📝 Committing updated CHANGELOG.md for $TAG"
+    git config --global user.name "github-actions[bot]"
+    git config --global user.email "github-actions[bot]@users.noreply.github.com"
     git add CHANGELOG.md
     git commit -m "chore: update CHANGELOG.md for $TAG [skip ci]"
 

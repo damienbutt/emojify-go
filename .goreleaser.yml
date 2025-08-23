@@ -5,8 +5,8 @@ before:
     - make clean
     - go generate ./...
     - go mod tidy
-    # - go tool git-chglog --next-tag {{ .Tag }} --output CHANGELOG.md
-    # - go tool git-chglog --next-tag {{ .Tag }} {{ .Tag }} --output RELEASE_NOTES.md
+    - ./scripts/generate-changelog.sh {{ .Tag }}
+    - ./scripts/generate-release-notes.sh {{ .Tag }}
 
 builds:
   - main: ./cmd/emojify
@@ -31,6 +31,9 @@ archives:
     format_overrides:
       - goos: windows
         formats: [zip]
+
+source:
+  enabled: true
 
 checksum:
   name_template: checksums.txt
@@ -94,6 +97,10 @@ aurs:
     license: MIT
     private_key: "{{ .Env.AUR_KEY }}"
     git_url: ssh://aur@aur.archlinux.org/emojify-go-bin.git
+    provides:
+      - emojify
+    conflicts:
+      - emojify
     package: |-
       # bin
       install -Dm755 "./emojify" "${pkgdir}/usr/bin/emojify"
@@ -106,56 +113,57 @@ aurs:
       install -Dm644 man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
     skip_upload: false
 
-# aur_sources:
-#   - name: emojify-go
-#     homepage: https://github.com/damienbutt/emojify-go
-#     description: Lighting fast Emoji conversion on the command line 😱
-#     maintainers:
-#       - Damien Butt <22627489+damienbutt@users.noreply.github.com>
-#     license: MIT
-#     private_key: "{{ .Env.AUR_KEY }}"
-#     git_url: ssh://aur@aur.archlinux.org/emojify-go.git
-#     ids:
-#       - linux
-#     depends:
-#       - glibc
-#     makedepends:
-#       - go
-#       - git
-#     prepare: |-
-#       cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
+aur_sources:
+  - name: emojify-go
+    homepage: https://github.com/damienbutt/emojify-go
+    description: Lighting fast Emoji conversion on the command line 😱
+    maintainers:
+      - Damien Butt <22627489+damienbutt@users.noreply.github.com>
+    license: MIT
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: ssh://aur@aur.archlinux.org/emojify-go.git
+    provides:
+      - emojify
+    conflicts:
+      - emojify
+    makedepends:
+      - go
+      - git
+    prepare: |-
+      cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
 
-#       # Set up Go environment for reproducible builds
-#       export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
-#       export CGO_ENABLED=0
+      # Set up Go environment for reproducible builds
+      export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
+      export CGO_ENABLED=0
 
-#       # Download dependencies
-#       go mod download
-#     build: |-
-#       cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
+      # Download dependencies
+      go mod download
+    build: |-
+      cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
 
-#       # Build the binary with proper flags
-#       export CGO_ENABLED=0
-#       export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
-#       export LDFLAGS="-linkmode=external -extldflags \"${LDFLAGS}\""
+      # Build the binary with proper flags
+      export CGO_ENABLED=0
+      export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
+      export LDFLAGS="-linkmode=external -extldflags \"${LDFLAGS}\""
 
-#       go build \
-#         -ldflags="-s -w -X github.com/damienbutt/emojify-go/internal/version.Version={{ .Version }} -X github.com/damienbutt/emojify-go/internal/version.Commit={{ .Commit }} -X github.com/damienbutt/emojify-go/internal/version.Date={{ .Date }} -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=makepkg ${LDFLAGS}" \
-#         -o emojify \
-#         ./cmd/emojify
-#     package: |-
-#       cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
+      go build \
+        -ldflags="-s -w -X github.com/damienbutt/emojify-go/internal/version.Version={{ .Version }} -X github.com/damienbutt/emojify-go/internal/version.Commit={{ .Commit }} -X github.com/damienbutt/emojify-go/internal/version.Date={{ .Date }} -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=makepkg ${LDFLAGS}" \
+        -o emojify \
+        ./cmd/emojify
+    package: |-
+      cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
 
-#       # Install binary
-#       install -Dm755 emojify "${pkgdir}/usr/bin/emojify"
+      # Install binary
+      install -Dm755 emojify "${pkgdir}/usr/bin/emojify"
 
-#       # Install license
-#       install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+      # Install license
+      install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
-#       # Install documentation
-#       install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
-#       install -Dm644 man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
-#     skip_upload: false
+      # Install documentation
+      install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+      install -Dm644 man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
+    skip_upload: false
+
 dockers:
   - image_templates:
       - "ghcr.io/damienbutt/emojify:{{ .Version }}-amd64"
