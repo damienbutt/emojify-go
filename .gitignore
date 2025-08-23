@@ -76,3 +76,6 @@ aur/*/emojify-go-*/
 
 # Local test tools
 .local/
+
+# Environment files
+.env

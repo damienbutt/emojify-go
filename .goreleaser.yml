@@ -70,6 +70,7 @@ homebrew_casks:
   - repository:
       owner: damienbutt
       name: homebrew-tap
+      token: "{{ .Env.RELEASE_TOKEN }}"
     name: emojify-go
     binary: emojify
     homepage: https://github.com/damienbutt/emojify-go
@@ -80,13 +81,31 @@ homebrew_casks:
 scoops:
   - name: emojify-go
     repository:
-      owner: ScoopInstaller
-      name: Main
-      branch: master
-      token: "{{ .Env.GITHUB_TOKEN }}"
+      owner: damienbutt
+      name: scoop-bucket
+      token: "{{ .Env.RELEASE_TOKEN }}"
     homepage: https://github.com/damienbutt/emojify-go
     description: Lighting fast Emoji conversion on the command line 😱
     license: MIT
+
+winget:
+  - publisher: damienbutt
+    release_notes_url: "https://github.com/damienbutt/emojify-go/releases/tag/{{.Tag}}"
+    license_url: https://github.com/damienbutt/emojify-go/blob/main/LICENSE
+    short_description: "Lighting fast Emoji conversion on the command line 😱"
+    license: MIT
+    repository:
+      owner: "damienbutt"
+      name: winget-pkgs
+      token: "{{ .Env.RELEASE_TOKEN }}"
+      pull_request:
+        enabled: true
+        draft: false
+        # check_boxes: true
+        base:
+          owner: microsoft
+          name: winget-pkgs
+          branch: master
 
 aurs:
   - name: emojify-go-bin
