@@ -163,51 +163,51 @@ jobs:
           retention-days: 30
 
   # Docker build and push
-  docker:
-    name: Build Docker Images
-    runs-on: ubuntu-latest
-    needs: [test, lint]
-    if: github.event_name == 'push'
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+  # docker:
+  #   name: Build Docker Images
+  #   runs-on: ubuntu-latest
+  #   needs: [test, lint]
+  #   if: github.event_name == 'push'
+  #   permissions:
+  #     contents: read
+  #     packages: write
+  #     id-token: write
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v5
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Log in to GitHub Container Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.repository_owner }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable={{is_default_branch}}
+  #     - name: Extract metadata
+  #       id: meta
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: ghcr.io/${{ github.repository }}
+  #         tags: |
+  #           type=ref,event=branch
+  #           type=ref,event=pr
+  #           type=semver,pattern={{version}}
+  #           type=semver,pattern={{major}}.{{minor}}
+  #           type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+  #     - name: Build and push Docker image
+  #       uses: docker/build-push-action@v6
+  #       with:
+  #         context: .
+  #         platforms: linux/amd64,linux/arm64
+  #         push: true
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
+  #         cache-from: type=gha
+  #         cache-to: type=gha,mode=max
 
   # Validate release prerequisites
   validate-release:
@@ -225,17 +225,11 @@ jobs:
 
       - name: Validate prerequisites
         env:
-          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
-          SCOOP_BUCKET_GITHUB_TOKEN: ${{ secrets.SCOOP_BUCKET_GITHUB_TOKEN }}
-          WINGET_GITHUB_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
-          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
-          AUR_KEY: ${{ secrets.AUR_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GPG_KEY_FILE: ${{ secrets.GPG_KEY_FILE }}
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+          GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
         run: ./scripts/validate-release-prerequisites.sh
 
   # GoReleaser configuration and build test
@@ -360,17 +354,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Log in to Docker Hub
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
@@ -380,51 +367,6 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
-          SCOOP_BUCKET_GITHUB_TOKEN: ${{ secrets.SCOOP_BUCKET_GITHUB_TOKEN }}
-          WINGET_GITHUB_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
-          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
-          AUR_KEY: ${{ secrets.AUR_KEY }}
-          GPG_KEY_FILE: ${{ secrets.GPG_KEY_FILE }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-
-  # Update package repositories
-  update-packages:
-    name: Update Package Repositories
-    runs-on: ubuntu-latest
-    needs: [release]
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Update Homebrew Formula
-        run: |
-          echo "Homebrew formula will be updated automatically by GoReleaser"
-
-      - name: Trigger AUR Package Update
-        run: |
-          echo "AUR package will be updated automatically by GoReleaser"
-
-      - name: Update Winget Manifest
-        run: |
-          echo "Winget manifest will be updated automatically by GoReleaser"
-
-  # Notify on successful release
-  notify:
-    name: Notify Release
-    runs-on: ubuntu-latest
-    needs: [release, update-packages]
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Get version
-        id: version
-        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-      - name: Create release announcement
-        run: |
-          echo "🚀 Emojify ${{ steps.version.outputs.version }} has been released!"
-          echo "📦 Available on multiple package managers"
-          echo "🍺 Homebrew: brew install damienbutt/tap/emojify"
-          echo "🪟 Scoop: scoop install emojify"
-          echo "🍫 Chocolatey: choco install emojify"
-          echo "📦 WinGet: winget install damienbutt.emojify"
-          echo "🐧 AUR: paru -S emojify-bin"
-          echo "📸 Snap: sudo snap install emojify"
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}

@@ -32,6 +32,21 @@ archives:
       - goos: windows
         formats: [zip]
 
+signs:
+  - artifacts: checksum
+    args:
+      [
+        "--pinentry-mode",
+        "loopback",
+        "--batch",
+        "-u",
+        "{{ .Env.GPG_FINGERPRINT }}",
+        "--output",
+        "${signature}",
+        "--detach-sign",
+        "${artifact}",
+      ]
+
 source:
   enabled: true
 
@@ -56,6 +71,12 @@ nfpms:
         dst: /usr/share/doc/emojify/LICENSE
       - src: ./README.md
         dst: /usr/share/doc/emojify/README.md
+    rpm:
+      signature:
+    deb:
+      signature:
+    apk:
+      signature:
 
 release:
   github:

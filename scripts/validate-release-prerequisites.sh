@@ -58,19 +58,14 @@ echo "----------------------------------"
 
 # GitHub tokens
 check_secret "GITHUB_TOKEN" "true" "GitHub Actions token (auto-provided)"
-check_secret "HOMEBREW_TAP_GITHUB_TOKEN" "true" "Token for Homebrew tap repository"
-# NOTE: SCOOP_BUCKET_GITHUB_TOKEN not needed when targeting main Scoop repository
+check_secret "RELEASE_TOKEN" "true" "Token for Homebrew tap repository"
 
 # GPG signing
 check_secret "GPG_PRIVATE_KEY" "true" "GPG private key for package signing"
-check_secret "GPG_PASSPHRASE" "true" "GPG key passphrase"
-check_secret "GPG_KEY_FILE" "false" "GPG key file for RPM signing"
+check_secret "GPG_FINGERPRINT" "true" "GPG key fingerprint for package signing"
 
 # Package manager APIs
-check_secret "AUR_KEY" "true" "SSH private key for AUR publishing (both emojify-go and emojify-go-bin)"
-
-# Optional services
-check_secret "CODECOV_TOKEN" "false" "Codecov.io token for coverage reporting"
+check_secret "AUR_SSH_PRIVATE_KEY" "true" "SSH private key for AUR publishing (both emojify-go and emojify-go-bin)"
 
 echo -e "\n${BLUE}🏗️  Checking Required Repositories${NC}"
 echo "--------------------------------------"
@@ -79,11 +74,9 @@ echo "--------------------------------------"
 if [ -n "${GITHUB_TOKEN}" ]; then
     check_github_repo "damienbutt/homebrew-tap" "Homebrew formula repository"
 
-    # Note: Scoop targets main repository, so no custom bucket needed
-    echo -e "${GREEN}✅ Scoop: Targeting main ScoopInstaller/Main repository${NC}"
+    check_github_repo "damienbutt/scoop-bucket" "Scoop bucket repository"
 
-    # Note: We can't easily check the WinGet fork without more complex logic
-    echo -e "${YELLOW}ℹ️  Note: Please ensure you have a fork of microsoft/winget-pkgs${NC}"
+    check_github_repo "damienbutt/winget-pkgs" "Winget package repository"
 else
     echo -e "${YELLOW}⚠️  Skipping repository checks (no GITHUB_TOKEN)${NC}"
 fi
