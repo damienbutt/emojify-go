@@ -66,10 +66,10 @@ sudo port install emojify-go
 ```bash
 # Arch Linux (AUR)
 # Install pre-built binary (faster)
-yay -S emojify-go-bin
+paru -S emojify-go-bin
 
 # Or build from source (latest features)
-yay -S emojify-go
+paru -S emojify-go
 
 # Ubuntu/Debian (DEB package)
 wget https://github.com/damienbutt/emojify/releases/latest/download/emojify-go_linux_amd64.deb

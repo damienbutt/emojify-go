@@ -30,7 +30,7 @@ end
 install -Dm644 man/emojify.1 "$pkgdir/usr/share/man/man1/emojify.1"
 ```
 
-**Installation**: `yay -S emojify-go-bin`
+**Installation**: `paru -S emojify-go-bin`
 **Man page location**: `/usr/share/man/man1/emojify.1`
 **Usage**: `man emojify`
 

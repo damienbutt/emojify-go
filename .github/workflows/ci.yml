@@ -426,5 +426,5 @@ jobs:
           echo "🪟 Scoop: scoop install emojify"
           echo "🍫 Chocolatey: choco install emojify"
           echo "📦 WinGet: winget install damienbutt.emojify"
-          echo "🐧 AUR: yay -S emojify-bin"
+          echo "🐧 AUR: paru -S emojify-bin"
           echo "📸 Snap: sudo snap install emojify"
