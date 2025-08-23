@@ -8,14 +8,14 @@ The `emojify` command includes a Unix manual page that is distributed through pa
 
 ### **Package Manager Integration** ✅ IMPLEMENTED
 
-Each package manager automatically installs the man page from `docs/man/emojify.1`:
+Each package manager automatically installs the man page from `man/emojify.1`:
 
 #### **🍎 Homebrew (macOS/Linux)**
 
 ```ruby
 # In Formula/emojify-go.rb
-if File.exist?("docs/man/emojify.1")
-  man1.install "docs/man/emojify.1"  # Automatic installation
+if File.exist?("man/emojify.1")
+  man1.install "man/emojify.1"  # Automatic installation
 end
 ```
 
@@ -27,7 +27,7 @@ end
 
 ```bash
 # In PKGBUILD
-install -Dm644 docs/man/emojify.1 "$pkgdir/usr/share/man/man1/emojify.1"
+install -Dm644 man/emojify.1 "$pkgdir/usr/share/man/man1/emojify.1"
 ```
 
 **Installation**: `yay -S emojify-go-bin`
@@ -58,7 +58,7 @@ curl -L https://github.com/damienbutt/emojify-go/releases/latest/download/emojif
 sudo mv emojify /usr/local/bin/
 
 # Install man page
-sudo cp docs/man/emojify.1 /usr/share/man/man1/
+sudo cp man/emojify.1 /usr/share/man/man1/
 sudo mandb  # Update man database
 ```
 
@@ -66,7 +66,7 @@ sudo mandb  # Update man database
 
 ### **Simple Design**
 
--   **Single source**: `docs/man/emojify.1` is the only man page file
+-   **Single source**: `man/emojify.1` is the only man page file
 -   **Package managers**: Handle installation to system directories
 -   **No embedding**: Follows standard Go CLI tool patterns
 -   **Clean distribution**: Included in release archives
@@ -90,8 +90,8 @@ The man page is embedded using a clean, single-source approach:
 
 ```
 
-docs/man/emojify.1 # ← Single source of truth
-cmd/emojify/emojify.1 -> ../../docs/man/emojify.1 # ← Symbolic link for embed
+man/emojify.1 # ← Single source of truth
+cmd/emojify/emojify.1 -> ../../man/emojify.1 # ← Symbolic link for embed
 man.go # ← Root-level package for embedding
 
 ````
@@ -104,7 +104,7 @@ package man
 
 import _ "embed"
 
-//go:embed docs/man/emojify.1
+//go:embed man/emojify.1
 var Page []byte
 
 func Install() error { /* ... */ }
@@ -145,7 +145,7 @@ archives:
     - files:
           - README.md
           - LICENSE.md
-          - docs/man/emojify.1 # ← Included in all packages
+          - man/emojify.1 # ← Included in all packages
 ```
 
 ## 🎯 User Experience
@@ -205,7 +205,7 @@ brew install damienbutt/tap/emojify-go
 man emojify
 
 # Test manual installation
-sudo cp docs/man/emojify.1 /usr/share/man/man1/
+sudo cp man/emojify.1 /usr/share/man/man1/
 sudo mandb
 man emojify
 ```

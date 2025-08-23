@@ -55,7 +55,7 @@ docs/
 
 1. **`package/maintain.sh`** - Package manifest testing
 2. **`package/update.sh`** - CI/CD update automation
-3. **`docs/man/manage-man.sh`** - Man page management
+3. **`man/manage-man.sh`** - Man page management
 
 ### **🎯 Makefile Targets:**
 

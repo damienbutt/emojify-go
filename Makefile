@@ -346,19 +346,19 @@ test-local-release:
 .PHONY: man
 man:
 	@echo "📖 Generating man page..."
-	@./docs/man/manage-man.sh generate
+	@./man/manage-man.sh generate
 
 # Preview man page
 .PHONY: preview-man
 preview-man:
 	@echo "👀 Previewing man page..."
-	@./docs/man/manage-man.sh preview
+	@./man/manage-man.sh preview
 
 # Install man page locally
 .PHONY: install-man
 install-man:
 	@echo "📥 Installing man page locally..."
-	@./docs/man/manage-man.sh install-local
+	@./man/manage-man.sh install-local
 
 # Development workflow: clean, build, and run
 .PHONY: dev

@@ -27,7 +27,7 @@ archives:
       - LICENSE*
       - README*
       - CHANGELOG*
-      - docs/man/*.1
+      - man/*.1
     format_overrides:
       - goos: windows
         formats: [zip]
@@ -72,7 +72,7 @@ homebrew_casks:
     homepage: https://github.com/damienbutt/emojify-go
     description: Lighting fast Emoji conversion on the command line 😱
     manpages:
-      - docs/man/emojify.1
+      - man/emojify.1
 
 scoops:
   - name: emojify-go
@@ -103,7 +103,7 @@ aurs:
 
       # documentation
       install -Dm644 "./README.md" "${pkgdir}/usr/share/doc/emojify-go/README.md"
-      install -Dm644 docs/man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
+      install -Dm644 man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
     skip_upload: false
 
 # aur_sources:
@@ -154,7 +154,7 @@ aurs:
 
 #       # Install documentation
 #       install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
-#       install -Dm644 docs/man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
+#       install -Dm644 man/emojify.1 "${pkgdir}/usr/share/man/man1/emojify.1"
 #     skip_upload: false
 dockers:
   - image_templates:

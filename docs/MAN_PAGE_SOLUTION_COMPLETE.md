@@ -30,7 +30,7 @@
 ### **3. Manual Installation** ✅
 
 -   **Direct binary users**: Man page included in all release archives
--   **Standard process**: `sudo cp docs/man/emojify.1 /usr/share/man/man1/`
+-   **Standard process**: `sudo cp man/emojify.1 /usr/share/man/man1/`
 -   **Database update**: Automatic `mandb`/`makewhatis` integration
 
 ## 🔧 Technical Implementation
@@ -71,7 +71,7 @@ end
 
 ```bash
 # Install man page
-install -Dm644 docs/man/emojify.1 "$pkgdir/usr/share/man/man1/emojify.1"
+install -Dm644 man/emojify.1 "$pkgdir/usr/share/man/man1/emojify.1"
 ```
 
 #### **Chocolatey PowerShell**
@@ -130,7 +130,7 @@ make test-chocolatey     # Chocolatey with Windows compatibility
 
 | Document                                                     | Purpose                       | Audience   |
 | ------------------------------------------------------------ | ----------------------------- | ---------- |
-| [`docs/man/emojify.1`](docs/man/emojify.1)                   | Professional Unix manual      | End users  |
+| [`man/emojify.1`](man/emojify.1)                   | Professional Unix manual      | End users  |
 | [`docs/MAN_PAGE_MANAGEMENT.md`](docs/MAN_PAGE_MANAGEMENT.md) | Complete implementation guide | Developers |
 | [`README.md`](README.md) - Documentation section             | User-facing documentation     | All users  |
 
