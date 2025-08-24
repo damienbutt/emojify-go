@@ -7,7 +7,7 @@ if [ "$CI" != "true" ]; then
   exit 0
 fi
 
-go tool git-chglog --next-tag "$1" --output CHANGELOG.md
+git-cliff --output CHANGELOG.md --verbose
 
 # Verify the changelog was generated
 if [ ! -s CHANGELOG.md ]; then

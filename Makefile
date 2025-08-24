@@ -359,7 +359,7 @@ changelog:
 		NEXT_TAG=$$(echo $$TAG | sed 's/v//') && \
 		NEXT_TAG="v$$(echo $$NEXT_TAG | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g')" && \
 		echo "📋 Generating for tag: $$NEXT_TAG" && \
-		go tool git-chglog --next-tag "$$NEXT_TAG" --output CHANGELOG.md && \
+		git-cliff --output CHANGELOG.md && \
 		echo "✅ CHANGELOG.md updated"
 
 .PHONY: changelog-preview
@@ -369,7 +369,7 @@ changelog-preview:
 		NEXT_TAG=$$(echo $$TAG | sed 's/v//') && \
 		NEXT_TAG="v$$(echo $$NEXT_TAG | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g')" && \
 		echo "📋 Preview for tag: $$NEXT_TAG" && \
-		go tool git-chglog --next-tag "$$NEXT_TAG"
+		git-cliff --unreleased
 
 # Pre-commit hook simulation
 .PHONY: pre-commit

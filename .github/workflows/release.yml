@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: make deps
 
+      - name: Set up git-cliff
+        uses: kenji-miyake/setup-git-cliff@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
