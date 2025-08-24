@@ -1,6 +1,3 @@
-# Dockerfile for GoReleaser
-# GoReleaser will use this to build container images with pre-built binaries
-
 # Get certificates and timezone data from Alpine
 FROM --platform=$BUILDPLATFORM alpine:latest AS certs
 RUN apk --no-cache add ca-certificates tzdata

@@ -1,6 +1,3 @@
-# Dockerfile for building from source
-# Use this for: docker build -t emojify-go .
-
 # Build stage
 FROM golang:1.25.0-alpine AS builder
 
