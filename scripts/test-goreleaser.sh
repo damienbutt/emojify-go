@@ -70,81 +70,30 @@ check_secret() {
 
 # Check essential secrets
 MISSING_SECRETS=0
-check_secret "GITHUB_TOKEN" "false" || true  # Auto-provided by GitHub Actions
+check_secret "RELEASE_TOKEN" "true" || ((MISSING_SECRETS++))
 check_secret "AUR_SSH_PRIVATE_KEY" "true" || ((MISSING_SECRETS++))
+check_secret "GPG_PRIVATE_KEY" "true" || ((MISSING_SECRETS++))
+check_secret "GPG_FINGERPRINT" "true" || ((MISSING_SECRETS++))
 
-if [[ $MISSING_SECRETS -gt 0 ]]; then
-    print_warning "Some secrets are missing - publishing will fail"
+if [[ $MISSING_SECRETS -eq 0 ]]; then
+    print_success "All secrets configured ✅"
 else
-    print_success "All required secrets are configured"
-fi
-echo
-
-# 3. Build test (without publishing)
-print_status "3. Testing build process (no publishing)..."
-
-# Set dummy environment variables for testing
-export GITHUB_TOKEN="dummy"
-export AUR_KEY="dummy"
-export GPG_KEY_FILE="dummy"
-
-# Base skip flags - always skip these for testing
-SKIP_FLAGS="--skip=publish --skip=sign --skip=validate"
-
-# Install missing tools for local testing
-print_status "3a. Checking and installing required tools..."
-
-# Create temporary bin directory for this test session
-TEMP_BIN_DIR=$(mktemp -d)/bin
-mkdir -p "$TEMP_BIN_DIR"
-export PATH="$TEMP_BIN_DIR:$PATH"
-
-if go tool goreleaser release --snapshot --clean $SKIP_FLAGS 2>/dev/null; then
-    print_success "Build process completed successfully"
-
-    # Check generated artifacts
-    print_status "4. Checking generated artifacts..."
-
-    if [[ -d "dist" ]]; then
-        BINARIES=$(find dist -name "emojify*" -type f | wc -l)
-        ARCHIVES=$(find dist -name "*.tar.gz" -o -name "*.zip" | wc -l)
-
-        print_success "Generated $BINARIES binaries"
-        print_success "Generated $ARCHIVES archives"
-
-        # List some key files
-        echo "   Key artifacts:"
-        find dist -maxdepth 1 \( -name "*.tar.gz" -o -name "*.zip" -o -name "checksums.txt" \) | head -5 | sed 's/^/   - /'
-    else
-        print_error "No dist directory found"
-    fi
-else
-    print_error "Build process failed"
-    echo
-    echo "Try running manually with more verbose output:"
-    echo "  go tool goreleaser release --snapshot --clean --skip=publish --skip=sign --skip=validate"
+    print_warning "$MISSING_SECRETS required secrets missing ⚠️"
     exit 1
 fi
 echo
 
-# 5. Repository access test
-print_status "5. Testing repository access..."
+# 3. GoReleaser Test (without publishing)
+print_status "3. Testing GoReleaser process (no publishing)..."
 
-if command -v gh >/dev/null 2>&1; then
-    if gh auth status >/dev/null 2>&1; then
-        print_success "GitHub CLI authenticated"
+# Base skip flags - always skip these for testing
+SKIP_FLAGS="--skip=publish --skip=sign --skip=validate"
 
-        # Test repository access
-        if gh repo view damienbutt/emojify-go >/dev/null 2>&1; then
-            print_success "Main repository accessible"
-        else
-            print_error "Cannot access main repository"
-        fi
-    else
-        print_warning "GitHub CLI not authenticated"
-    fi
+if go tool goreleaser release --snapshot --clean $SKIP_FLAGS --verbose; then
+    print_success "GoReleaser process completed successfully"
 else
-    print_warning "GitHub CLI not installed"
+    print_error "GoReleaser process failed"
+    exit 1
 fi
 echo
 
@@ -153,35 +102,5 @@ print_status "📋 Test Summary"
 echo "==============="
 echo
 
-if [[ $MISSING_SECRETS -eq 0 ]]; then
-    print_success "All secrets configured ✅"
-else
-    print_warning "$MISSING_SECRETS required secrets missing ⚠️"
-fi
-
 print_success "Configuration valid ✅"
-print_success "Build process works ✅"
-print_success "Artifacts generated ✅"
-
-echo
-if [[ $MISSING_SECRETS -eq 0 ]]; then
-    print_success "🎉 Ready for release! All tests passed."
-    echo
-    echo "To create a release:"
-    echo "  git tag v1.0.0"
-    echo "  git push origin v1.0.0"
-else
-    print_warning "⚠️  Almost ready! Configure missing secrets first."
-    echo
-    echo "Missing secrets can be added with:"
-    echo "  gh secret set SECRET_NAME"
-fi
-
-echo
-echo "Clean up test artifacts:"
-echo "  rm -rf dist/"
-
-# Clean up temporary tools
-if [ -n "$TEMP_BIN_DIR" ] && [ -d "$TEMP_BIN_DIR" ]; then
-    rm -rf "$(dirname "$TEMP_BIN_DIR")"
-fi
+print_success "GoReleaser process works ✅"

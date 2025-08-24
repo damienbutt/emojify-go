@@ -61,7 +61,7 @@ jobs:
           version: "~> v2"
           install-only: true
 
-      - name: Run comprehensive GoReleaser test
+      - name: Run GoReleaser test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
@@ -69,5 +69,4 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
         run: |
-          make goreleaser-check
           make goreleaser-test
