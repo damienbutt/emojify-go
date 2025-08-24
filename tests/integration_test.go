@@ -336,7 +336,11 @@ func (suite *IntegrationTestSuite) TestVersionFlag() {
 
 			version := strings.TrimSpace(string(output))
 			assert.NotEmpty(suite.T(), version, "Version should not be empty")
-			assert.Regexp(suite.T(), `^\d+\.\d+\.\d+`, version, "Version should match semantic versioning")
+
+			// For local builds, version is "dev". For release builds, it's a semantic version.
+			if version != "dev" {
+				assert.Regexp(suite.T(), `^v\d+\.\d+\.\d+`, version, "Version should match semantic versioning (e.g., v1.2.3)")
+			}
 		})
 	}
 }
