@@ -63,3 +63,17 @@ jobs:
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
           GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
+
+      - name: Update GitHub Release with Release Notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Uploading release notes to GitHub Release..."
+          gh release edit ${{ github.ref_name }} --notes-file RELEASE_NOTES.md
+
+      - name: Commit Changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Committing updated CHANGELOG.md..."
+          ./scripts/commit-changelog.sh ${{ github.ref_name }}

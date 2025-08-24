@@ -8,3 +8,9 @@ if [ "$CI" != "true" ]; then
 fi
 
 go tool git-chglog --next-tag "$1" "$1" --output RELEASE_NOTES.md
+
+# Verify the release notes were generated
+if [ ! -s RELEASE_NOTES.md ]; then
+    echo "Release notes generation failed or produced an empty file"
+    exit 1
+fi

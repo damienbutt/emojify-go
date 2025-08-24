@@ -8,3 +8,9 @@ if [ "$CI" != "true" ]; then
 fi
 
 go tool git-chglog --next-tag "$1" --output CHANGELOG.md
+
+# Verify the changelog was generated
+if [ ! -s CHANGELOG.md ]; then
+    echo "Changelog generation failed or produced an empty file"
+    exit 1
+fi
