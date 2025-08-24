@@ -162,53 +162,6 @@ jobs:
           path: emojify-*
           retention-days: 30
 
-  # Docker build and push
-  # docker:
-  #   name: Build Docker Images
-  #   runs-on: ubuntu-latest
-  #   needs: [test, lint]
-  #   if: github.event_name == 'push'
-  #   permissions:
-  #     contents: read
-  #     packages: write
-  #     id-token: write
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v5
-
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-
-  #     - name: Log in to GitHub Container Registry
-  #       uses: docker/login-action@v3
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.repository_owner }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-
-  #     - name: Extract metadata
-  #       id: meta
-  #       uses: docker/metadata-action@v5
-  #       with:
-  #         images: ghcr.io/${{ github.repository }}
-  #         tags: |
-  #           type=ref,event=branch
-  #           type=ref,event=pr
-  #           type=semver,pattern={{version}}
-  #           type=semver,pattern={{major}}.{{minor}}
-  #           type=raw,value=latest,enable={{is_default_branch}}
-
-  #     - name: Build and push Docker image
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         context: .
-  #         platforms: linux/amd64,linux/arm64
-  #         push: true
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
-  #         cache-from: type=gha
-  #         cache-to: type=gha,mode=max
-
   # Validate release prerequisites
   validate-release:
     name: Validate Release Prerequisites
@@ -273,44 +226,13 @@ jobs:
         env:
           # Provide dummy values for test environment
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHOCOLATEY_API_KEY: "dummy"
-          WINGET_GITHUB_TOKEN: "dummy"
-          AUR_KEY: "dummy"
-          GPG_KEY_FILE: "dummy"
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
         run: |
-          echo "🧪 Running GoReleaser configuration validation and build test..."
-
-          # 1. Configuration check
-          echo "📋 Validating GoReleaser configuration..."
-          goreleaser check || {
-            if [[ $? -eq 2 ]]; then
-              echo "⚠️ Configuration valid but has deprecation warnings"
-            else
-              echo "❌ Configuration has errors"
-              exit 1
-            fi
-          }
-
-          # 2. Build test (without publishing)
-          echo "🔨 Testing build process..."
-          goreleaser release --snapshot --clean --skip=publish --skip=sign --skip=snapcraft --skip=chocolatey --skip=docker
-
-          # 3. Verify artifacts were created
-          echo "📦 Verifying artifacts..."
-          if [[ -d "dist" ]]; then
-            BINARIES=$(find dist -name "emojify*" -type f | wc -l)
-            ARCHIVES=$(find dist -name "*.tar.gz" -o -name "*.zip" | wc -l)
-            echo "✅ Generated $BINARIES binaries and $ARCHIVES archives"
-
-            # Show key artifacts
-            echo "📁 Key artifacts created:"
-            find dist -maxdepth 1 \( -name "*.tar.gz" -o -name "*.zip" -o -name "checksums.txt" \) | head -5 | sed 's/^/  - /'
-          else
-            echo "❌ No dist directory found"
-            exit 1
-          fi
-
-          echo "✅ GoReleaser test completed successfully - ready for release!"
+          make goreleaser-check
+          make goreleaser-test
 
   # Release with GoReleaser
   release:
