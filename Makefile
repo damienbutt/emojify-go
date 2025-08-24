@@ -1,6 +1,3 @@
-# Emojify Build System
-# Build and manage the Go emoji CLI tool
-
 # Build configuration
 APP_NAME := emojify
 GO_MODULE := github.com/damienbutt/emojify-go
@@ -320,28 +317,6 @@ vuln-check:
 	@go tool govulncheck ./... || echo "⚠️  govulncheck not found, skipping"
 	@echo "✅ Vulnerability check complete"
 
-# Create a distributable package
-.PHONY: package
-package: build-all
-	@echo "📦 Creating distribution packages..."
-	@mkdir -p $(DIST_DIR)
-	@for binary in $(BUILD_DIR)/$(APP_NAME)-*; do \
-		platform=$$(basename $$binary | sed 's/$(APP_NAME)-//'); \
-		mkdir -p $(DIST_DIR)/$$platform; \
-		cp $$binary $(DIST_DIR)/$$platform/$(APP_NAME)$$(echo $$platform | grep -q windows && echo .exe || echo ""); \
-		cp README.md $(DIST_DIR)/$$platform/; \
-		cp LICENSE $(DIST_DIR)/$$platform/; \
-		cd $(DIST_DIR) && tar -czf $(APP_NAME)-$(VERSION)-$$platform.tar.gz $$platform/; \
-		cd ..; \
-	done
-	@echo "✅ Distribution packages created in $(DIST_DIR)/"
-
-# Test local package generation with GoReleaser
-.PHONY: test-local-release
-test-local-release:
-	@echo "🚀 Testing local package generation..."
-	@go tool goreleaser release --config .goreleaser-local.yml --snapshot --clean --skip=publish
-
 # Generate man page
 .PHONY: man
 man:
@@ -375,41 +350,6 @@ goreleaser-check:
 goreleaser-test:
 	@echo "🧪 Running comprehensive GoReleaser test suite..."
 	@./scripts/test-goreleaser.sh
-
-.PHONY: goreleaser-build
-goreleaser-build:
-	@echo "🔨 Building with GoReleaser..."
-	@go tool goreleaser build --snapshot --clean || echo "⚠️  goreleaser not found"
-
-.PHONY: goreleaser-test-release-notes
-goreleaser-test-release-notes:
-	@echo "📝 Testing release notes generation..."
-	@if [ -z "$(VERSION)" ]; then echo "⚠️  VERSION is required. Usage: make goreleaser-test-release-notes VERSION=v1.0.0"; exit 1; fi
-	@echo "📋 Generating release notes for $(VERSION)..."
-	@go tool git-chglog --tag-filter-pattern $(VERSION) --output RELEASE_NOTES.md $(VERSION)
-	@echo "✅ Release notes generated: RELEASE_NOTES.md"
-	@echo "📄 Content preview:"
-	@head -20 RELEASE_NOTES.md
-
-.PHONY: goreleaser-release
-goreleaser-release:
-	@echo "🚀 Creating release with GoReleaser..."
-	@if [ -z "$(VERSION)" ]; then echo "⚠️  VERSION is required. Usage: make goreleaser-release VERSION=v1.0.0"; exit 1; fi
-	@echo "📝 Generating release notes for $(VERSION)..."
-	@go tool git-chglog --tag-filter-pattern $(VERSION) --output RELEASE_NOTES.md $(VERSION)
-	@go tool goreleaser release --clean --release-notes RELEASE_NOTES.md || echo "⚠️  goreleaser not found"
-
-.PHONY: goreleaser-release-with-changelog
-goreleaser-release-with-changelog:
-	@echo "🚀 Creating release with GoReleaser and committing changelog..."
-	@echo "📋 Getting next tag..."
-	@TAG=$$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0") && \
-		NEXT_TAG=$$(echo $$TAG | sed 's/v//') && \
-		NEXT_TAG="v$$(echo $$NEXT_TAG | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g')" && \
-		echo "📦 Releasing $$NEXT_TAG..." && \
-		go tool goreleaser release --clean && \
-		echo "📝 Committing updated changelog..." && \
-		./scripts/commit-changelog.sh "$$NEXT_TAG"
 
 # Changelog generation targets
 .PHONY: changelog
@@ -515,12 +455,8 @@ help:
 	@echo "📦 Release targets:"
 	@echo "  goreleaser-check   Check GoReleaser configuration"
 	@echo "  goreleaser-test    Run comprehensive GoReleaser test suite"
-	@echo "  goreleaser-build   Build with GoReleaser"
-	@echo "  goreleaser-release Create release with GoReleaser"
-	@echo "  goreleaser-release-with-changelog Create release and commit changelog"
 	@echo "  changelog          Generate CHANGELOG.md for next version"
 	@echo "  changelog-preview  Preview changelog for next version"
-	@echo "  package      Create distribution packages"
 	@echo ""
 	@echo "🔄 Utility targets:"
 	@echo "  update-emoji Update emoji data from GitHub"
