@@ -2,6 +2,7 @@ name: Release Pre-checks
 
 on:
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   prerequisites:
