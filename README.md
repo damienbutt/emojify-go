@@ -25,8 +25,8 @@ git log --oneline | emojify | head -5
 
 ## ✨ Features
 
--   � **Bidirectional Conversion**: Encode aliases to emojis and decode emojis back to aliases
--   �🚀 **Lightning Fast**: 169.9x faster than bash version (up to 758x on large files)
+-   ↔️ **Bidirectional Conversion**: Encode aliases to emojis and decode emojis back to aliases
+-   ⚡ **Lightning Fast**: 169.9x faster than bash version (up to 758x on large files)
 -   🌍 **Cross-Platform**: Single binary for Linux, macOS, Windows (AMD64 & ARM64)
 -   📦 **Zero Dependencies**: No runtime dependencies, just download and run
 -   🎯 **100% Compatible**: Drop-in replacement for original emojify
@@ -53,9 +53,6 @@ _Lightning-fast emoji conversion in action! See the 169.9x performance improveme
 ```bash
 # Homebrew
 brew install damienbutt/tap/emojify-go
-
-# MacPorts (coming soon)
-sudo port install emojify-go
 ```
 
 </details>
@@ -65,24 +62,18 @@ sudo port install emojify-go
 
 ```bash
 # Arch Linux (AUR)
-# Install pre-built binary (faster)
+# Install pre-built binary
 paru -S emojify-go-bin
 
-# Or build from source (latest features)
+# Or build from source
 paru -S emojify-go
 
 # Ubuntu/Debian (DEB package)
-wget https://github.com/damienbutt/emojify/releases/latest/download/emojify-go_linux_amd64.deb
+wget https://github.com/damienbutt/emojify-go/releases/latest/download/emojify-go_linux_amd64.deb
 sudo dpkg -i emojify-go_linux_amd64.deb
 
 # RHEL/CentOS/Fedora (RPM package)
-sudo rpm -i https://github.com/damienbutt/emojify/releases/latest/download/emojify-go_linux_amd64.rpm
-
-# Snap
-sudo snap install emojify-go
-
-# Pacman
-sudo pacman -S emojify-go
+sudo rpm -i https://github.com/damienbutt/emojify-go/releases/latest/download/emojify-go_linux_amd64.rpm
 ```
 
 </details>
@@ -94,16 +85,13 @@ sudo pacman -S emojify-go
 # Scoop
 scoop install emojify-go
 
-# Chocolatey
-choco install emojify-go
-
 # WinGet
 winget install damienbutt.emojify-go
 ```
 
 </details>
 
-<details>
+<!-- <details>
 <summary><strong>❄️ NixOS / Nix</strong></summary>
 
 ```bash
@@ -120,7 +108,7 @@ nix-env -f default.nix -i emojify-go
 nix develop github:damienbutt/emojify-go
 ```
 
-</details>
+</details> -->
 
 ### 🐳 Docker
 
@@ -138,15 +126,15 @@ Download the latest binary for your platform from the [releases page](https://gi
 
 ```bash
 # Linux (AMD64)
-curl -L https://github.com/damienbutt/emojify/releases/latest/download/emojify-go_linux_amd64.tar.gz | tar xz
+curl -L https://github.com/damienbutt/emojify-go/releases/latest/download/emojify-go_linux_amd64.tar.gz | tar xz
 sudo mv emojify-go /usr/local/bin/emojify
 
 # macOS (ARM64)
-curl -L https://github.com/damienbutt/emojify/releases/latest/download/emojify-go_darwin_arm64.tar.gz | tar xz
+curl -L https://github.com/damienbutt/emojify-go/releases/latest/download/emojify-go_darwin_arm64.tar.gz | tar xz
 sudo mv emojify-go /usr/local/bin/emojify
 
 # Windows (AMD64)
-curl -L https://github.com/damienbutt/emojify/releases/latest/download/emojify-go_windows_amd64.zip -o emojify.zip
+curl -L https://github.com/damienbutt/emojify-go/releases/latest/download/emojify-go_windows_amd64.zip -o emojify.zip
 unzip emojify.zip
 ```
 
@@ -343,63 +331,11 @@ make benchmark
 seq 1 10000 | sed 's/.*/:rocket: Line &/' | time emojify > /dev/null
 ```
 
-## 🎨 Emoji Reference
-
-<details>
-<summary><strong>Popular Emojis</strong></summary>
-
-| Alias     | Emoji | Alias        | Emoji | Alias            | Emoji |
-| --------- | ----- | ------------ | ----- | ---------------- | ----- |
-| `:+1:`    | 👍    | `:rocket:`   | 🚀    | `:100:`          | 💯    |
-| `:tada:`  | 🎉    | `:sparkles:` | ✨    | `:fire:`         | 🔥    |
-| `:heart:` | ❤️    | `:bug:`      | 🐛    | `:construction:` | 🚧    |
-| `:lock:`  | 🔒    | `:key:`      | 🔑    | `:mag:`          | 🔍    |
-| `:bulb:`  | 💡    | `:zap:`      | ⚡    | `:boom:`         | 💥    |
-
-</details>
-
-<details>
-<summary><strong>Git Workflow Emojis</strong></summary>
-
-| Type     | Alias                   | Emoji | Description      |
-| -------- | ----------------------- | ----- | ---------------- |
-| Feat     | `:sparkles:`            | ✨    | New feature      |
-| Fix      | `:bug:`                 | 🐛    | Bug fix          |
-| Docs     | `:books:`               | 📚    | Documentation    |
-| Style    | `:art:`                 | 🎨    | Code style       |
-| Refactor | `:recycle:`             | ♻️    | Code refactoring |
-| Test     | `:white_check_mark:`    | ✅    | Tests            |
-| Build    | `:construction_worker:` | 👷    | Build system     |
-| CI       | `:green_heart:`         | 💚    | CI/CD            |
-
-</details>
-
-```bash
-# See all 2,500+ available emojis
-emojify --list | head -20
-```
-
 ## 📖 Documentation
 
 ### Man Page
 
 Emojify includes a comprehensive Unix manual page that provides detailed documentation about all commands and options.
-
-#### **Access Methods**
-
-```bash
-# View embedded man page (works anywhere)
-emojify --show-man
-
-# Install man page to system (for `man emojify`)
-emojify --install-man
-
-# Use standard man command (after installation)
-man emojify
-
-# Remove installed man page
-emojify --uninstall-man
-```
 
 #### **Package Manager Installation**
 
@@ -412,12 +348,6 @@ man emojify
 
 **Supported Systems**: macOS, Linux, Windows (WSL/MSYS2/Cygwin)
 
-#### **Documentation**
-
--   📖 [Man Page Management Guide](docs/MAN_PAGE_MANAGEMENT.md) - Complete documentation setup
--   📦 [Package Management](package/README.md) - Package distribution details
--   🏗️ [Release Setup](docs/RELEASE_SETUP.md) - Release automation configuration
-
 ## 🏗️ Development
 
 ### Prerequisites
@@ -428,8 +358,8 @@ man emojify
 ### Setup
 
 ```bash
-git clone https://github.com/damienbutt/emojify.git
-cd emojify
+git clone https://github.com/damienbutt/emojify-go.git
+cd emojify-go
 make dev-setup  # Downloads dependencies
 ```
 
@@ -444,9 +374,6 @@ make build-all               # Output: build/emojify-{os}-{arch}
 
 # Create optimized release binary
 make release                 # Output: build/emojify (optimized)
-
-# GoReleaser snapshot
-make goreleaser-build        # Output: dist/
 ```
 
 ### Testing
@@ -490,71 +417,7 @@ go vet ./...
 gosec ./...
 ```
 
-### Package Management
-
-The repository maintains package manifests for various package managers:
-
-```bash
-# Test all package manifests
-make test-packages
-
-# Test specific package managers
-make test-homebrew            # Test Homebrew formula
-make test-scoop              # Test Scoop manifest
-
-# Show package status
-make package-status
-
-# Test local package generation
-make test-local-release      # Uses GoReleaser
-```
-
-**Package Manifests Location:**
-
--   `package/homebrew/emojify-go.rb` - Homebrew formula
--   `package/scoop/emojify-go.json` - Scoop manifest
--   `package/aur/` - Arch Linux packages (PKGBUILD files)
--   `package/nix/flake.nix`, `package/nix/default.nix` - Nix packages
-
-See [`package/README.md`](package/README.md) for detailed package management documentation.
-
-### Project Structure
-
-```
-emojify/
-├── cmd/
-│   ├── emojify/              # Main CLI application
-│   └── emojify-scraper/      # Emoji data scraper
-├── internal/
-│   ├── emojify/             # Core processing logic
-│   │   ├── processor.go     # Main processing engine
-│   │   ├── processor_test.go
-│   │   └── benchmark_test.go
-│   ├── emoji/               # Emoji data and utilities
-│   │   ├── data.go          # 2,500+ emoji mappings
-│   │   ├── scraper.go       # GitHub gemoji scraper
-│   │   └── data_test.go
-│   └── version/             # Version information
-├── tests/                   # Integration tests
-├── scripts/                 # Utility scripts
-├── .github/workflows/       # CI/CD pipelines
-├── .goreleaser.yaml         # Release configuration
-├── Dockerfile              # Container image
-├── Makefile                # Build automation
-└── README.md
-```
-
 ## 🔧 Configuration
-
-### Environment Variables
-
-```bash
-# Enable debug output
-export EMOJIFY_DEBUG=1
-
-# Custom emoji database URL (advanced)
-export EMOJIFY_DB_URL=https://custom-emoji-db.json
-```
 
 ### Git Configuration
 
@@ -625,7 +488,6 @@ We love contributions! Here's how you can help:
 -   Run `make lint` before committing
 -   Include benchmarks for performance-critical code
 -   Update documentation for user-facing changes
--   Use emoji commits! `:sparkles: feat:`, `:bug: fix:`, etc.
 
 ### Areas for Contribution
 
@@ -673,20 +535,3 @@ Made with :heart: and :coffee:
 **Star ⭐ this repo if you find it useful!**
 
 </div>
-
-<!-- Round-trip conversion
-echo "Hello :wave: world" | emojify --encode | emojify --decode -->
-
-<!-- # Output: Hello :wave: world
-
-# Convert emoji-rich text to aliases for storage/transmission
-
-echo "Great work! 👍 🎉 🚀" | emojify --decode
-
-# Output: Great work! :+1: :tada: :rocket:
-
-# Convert back to emojis for display
-
-echo "Great work! :+1: :tada: :rocket:" | emojify --encode
-
-# Output: Great work! 👍 🎉 🚀ienbutt/emojify)](https://github.com/damienbutt/emojify/releases) -->
