@@ -13,6 +13,7 @@ jobs:
   release-prechecks:
     name: Release Pre-checks
     uses: ./.github/workflows/release-prechecks.yml
+    secrets: inherit
 
   release:
     name: Release
