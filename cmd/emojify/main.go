@@ -17,7 +17,7 @@ import (
 func main() {
 	cmd := &cli.Command{
 		Name:    "emojify",
-		Usage:   "emoji on the command line 😱",
+		Usage:   "lightning fast Emoji on the command line 😱",
 		Version: version.Version,
 		Authors: []any{
 			"Damien Butt",
