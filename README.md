@@ -1,10 +1,12 @@
 # 🎉 Emojify
 
+[![CI](https://github.com/damienbutt/emojify-go/workflows/CI/badge.svg)](https://github.com/damienbutt/emojify-go/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/damienbutt/emojify-go)](https://goreportcard.com/report/github.com/damienbutt/emojify-go)
+[![codecov](https://codecov.io/gh/damienbutt/emojify-go/branch/main/graph/badge.svg)](https://codecov.io/gh/damienbutt/emojify-go)
 [![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)](https://golang.org)
 [![Release](https://img.shields.io/github/v/release/damienbutt/emojify-go)](https://github.com/damienbutt/emojify-go/releases)
+[![Downloads](https://img.shields.io/github/downloads/damienbutt/emojify-go/total.svg)](https://github.com/damienbutt/emojify-go/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/damienbutt/emojify-go)](https://goreportcard.com/report/github.com/damienbutt/emojify-go)
-[![CI](https://github.com/damienbutt/emojify-go/workflows/CI/badge.svg)](https://github.com/damienbutt/emojify-go/actions)
 
 A lightning-fast, cross-platform command-line tool for bidirectional emoji conversion. Convert between emoji aliases (`:smile:`) and Unicode emoji characters (😄) seamlessly. This is a complete Go rewrite of the original [emojify](https://github.com/mrowa44/emojify) bash script with **169.9x better performance** and modern tooling.
 
@@ -23,7 +25,54 @@ git log --oneline | emojify | head -5
 # 📚 docs: update README :books:
 ```
 
-## ✨ Features
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## :book: **Contents**
+
+- [:sparkles: Features](#sparkles-features)
+- [:package: Installation](#package-installation)
+  - [Package Managers (Recommended)](#package-managers-recommended)
+  - [:whale: Docker](#whale-docker)
+  - [:inbox_tray: Direct Download](#inbox_tray-direct-download)
+  - [:hammer_and_wrench: Build from Source](#hammer_and_wrench-build-from-source)
+  - [:inbox_tray: Go Install](#inbox_tray-go-install)
+- [:rocket: Usage](#rocket-usage)
+  - [Basic Usage](#basic-usage)
+  - [Bidirectional Conversion](#bidirectional-conversion)
+  - [Pipeline Usage](#pipeline-usage)
+  - [Command Options](#command-options)
+- [:books: Examples](#books-examples)
+  - [Git Integration](#git-integration)
+  - [Common Use Cases](#common-use-cases)
+  - [Advanced Pipeline Examples](#advanced-pipeline-examples)
+- [:zap: Performance](#zap-performance)
+  - [Benchmarks](#benchmarks)
+- [:book: Documentation](#book-documentation)
+  - [Man Page](#man-page)
+    - [**Package Manager Installation**](#package-manager-installation)
+- [:building_construction: Development](#building_construction-development)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+  - [Building](#building)
+  - [Testing](#testing)
+  - [Code Quality](#code-quality)
+- [:wrench: Configuration](#wrench-configuration)
+  - [Git Configuration](#git-configuration)
+- [:whale: Docker](#whale-docker-1)
+  - [Using the Official Image](#using-the-official-image)
+  - [Building Custom Image](#building-custom-image)
+- [:handshake: Contributing](#handshake-contributing)
+  - [Quick Start](#quick-start)
+  - [Development Guidelines](#development-guidelines)
+  - [Areas for Contribution](#areas-for-contribution)
+- [:balance_scale: License](#balance_scale-license)
+- [:pray: Acknowledgments](#pray-acknowledgments)
+- [:bar_chart: Status](#bar_chart-status)
+- [:link: Related Projects](#link-related-projects)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## :sparkles: Features
 
 -   ↔️ **Bidirectional Conversion**: Encode aliases to emojis and decode emojis back to aliases
 -   ⚡ **Lightning Fast**: 169.9x faster than bash version (up to 758x on large files)
@@ -43,7 +92,7 @@ git log --oneline | emojify | head -5
 
 _Lightning-fast emoji conversion in action! See the 169.9x performance improvement over the original bash version._ -->
 
-## 📦 Installation
+## :package: Installation
 
 ### Package Managers (Recommended)
 
@@ -91,26 +140,44 @@ winget install damienbutt.emojify-go
 
 </details>
 
-<!-- <details>
+<details>
 <summary><strong>❄️ NixOS / Nix</strong></summary>
 
-```bash
-# Using Nix Flakes (recommended)
-nix profile install github:damienbutt/emojify-go
+`emojify-go` is available in a [Nix User Repository (NUR)](https://github.com/damienbutt/nur).
 
-# Run without installing
-nix run github:damienbutt/emojify-go
+To install `emojify-go` from the NUR, you first need to add the NUR to your Nix configuration. This is a one-time setup step.
 
-# Traditional Nix
-nix-env -f default.nix -i emojify-go
+**1. Add the NUR to your Nix configuration**
 
-# Development environment
-nix develop github:damienbutt/emojify-go
+Add the following to your `~/.config/nixpkgs/config.nix` file:
+
+```nix
+{
+  packageOverrides = pkgs: {
+    nur = import (builtins.fetchTarball "https://github.com/damienbutt/nur/archive/master.tar.gz") {
+      inherit pkgs;
+    };
+  };
+}
 ```
 
-</details> -->
+**2. Install the package**
 
-### 🐳 Docker
+```bash
+nix-env -iA nur.repos.damienbutt.emojify-go
+```
+
+**Note on Nix Flakes**
+
+If you're using Nix Flakes, you can install `emojify-go` directly from the NUR repo:
+
+```bash
+nix profile install github:damienbutt/nur#emojify-go
+```
+
+</details>
+
+### :whale: Docker
 
 ```bash
 # Run directly
@@ -120,7 +187,7 @@ echo "Hello :wave: world" | docker run --rm -i ghcr.io/damienbutt/emojify-go
 alias emojify='docker run --rm -i ghcr.io/damienbutt/emojify-go'
 ```
 
-### 📥 Direct Download
+### :inbox_tray: Direct Download
 
 Download the latest binary for your platform from the [releases page](https://github.com/damienbutt/emojify/releases).
 
@@ -138,7 +205,7 @@ curl -L https://github.com/damienbutt/emojify-go/releases/latest/download/emojif
 unzip emojify.zip
 ```
 
-### 🛠️ Build from Source
+### :hammer_and_wrench: Build from Source
 
 ```bash
 git clone https://github.com/damienbutt/emojify-go.git
@@ -147,13 +214,13 @@ make build
 ./build/emojify "Hello :wave:"
 ```
 
-### 📥 Go Install
+### :inbox_tray: Go Install
 
 ```bash
 go install github.com/damienbutt/emojify-go/cmd/emojify@latest
 ```
 
-## 🚀 Usage
+## :rocket: Usage
 
 ### Basic Usage
 
@@ -244,7 +311,7 @@ emojify -h
 -   `--encode` and `--decode` flags are mutually exclusive.
 -   When using shell pipes or arguments with special characters (`!`, `$`, etc.), wrap strings in single quotes or escape them properly.
 
-## 📚 Examples
+## :books: Examples
 
 ### Git Integration
 
@@ -308,7 +375,7 @@ git shortlog -sn | head -10 | sed 's/^/👤 /' | emojify
 tail -f app.log | while read line; do echo "$(date '+%H:%M:%S') :clock: $line"; done | emojify
 ```
 
-## ⚡ Performance
+## :zap: Performance
 
 Emojify is built for speed and handles large inputs efficiently:
 
@@ -331,7 +398,7 @@ make benchmark
 seq 1 10000 | sed 's/.*/:rocket: Line &/' | time emojify > /dev/null
 ```
 
-## 📖 Documentation
+## :book: Documentation
 
 ### Man Page
 
@@ -348,7 +415,7 @@ man emojify
 
 **Supported Systems**: macOS, Linux, Windows (WSL/MSYS2/Cygwin)
 
-## 🏗️ Development
+## :building_construction: Development
 
 ### Prerequisites
 
@@ -417,7 +484,7 @@ go vet ./...
 gosec ./...
 ```
 
-## 🔧 Configuration
+## :wrench: Configuration
 
 ### Git Configuration
 
@@ -441,7 +508,7 @@ EOF
 git config --global commit.template ~/.gitmessage
 ```
 
-## 🐳 Docker
+## :whale: Docker
 
 ### Using the Official Image
 
@@ -466,7 +533,7 @@ docker build -t my-emojify .
 echo "Custom build :hammer:" | docker run --rm -i my-emojify
 ```
 
-## 🤝 Contributing
+## :handshake: Contributing
 
 We love contributions! Here's how you can help:
 
@@ -500,25 +567,25 @@ We love contributions! Here's how you can help:
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
-## 📄 License
+## :balance_scale: License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## 🙏 Acknowledgments
+## :pray: Acknowledgments
 
 -   **[Original emojify](https://github.com/mrowa44/emojify)** - Inspiration and compatibility
 -   **[GitHub Gemoji](https://github.com/github/gemoji)** - Emoji database
 -   **[urfave/cli](https://github.com/urfave/cli)** - Excellent CLI framework
 -   **[testify](https://github.com/stretchr/testify)** - Testing framework
 
-## 📊 Status
+## :bar_chart: Status
 
 -   ✅ **Production Ready**: Used in CI/CD pipelines and development workflows
 -   ✅ **Actively Maintained**: Regular updates and improvements
 -   ✅ **Cross-Platform**: Supports all major platforms and architectures
 -   ✅ **Well Tested**: Comprehensive test suite with >95% coverage
 
-## 🔗 Related Projects
+## :link: Related Projects
 
 -   **[emojify](https://github.com/mrowa44/emojify)** - Original bash implementation
 -   **[pyemojify](https://github.com/lord63/pyemojify)** - Python implementation

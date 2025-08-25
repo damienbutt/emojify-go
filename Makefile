@@ -386,6 +386,12 @@ ci: deps lint test build
 ci-full: deps lint test-coverage build-all
 	@echo "✅ Full CI pipeline completed successfully"
 
+.PHONY: toc
+toc:
+	@echo "📋 Generating TOC for README.md..."
+	@doctoc --title "## :book: **Contents**" README.md
+	@echo "✅ TOC generation complete"
+
 # Show build information
 .PHONY: info
 info:
@@ -463,6 +469,7 @@ help:
 	@echo "  dev          Development workflow (clean + build + run)"
 	@echo "  info         Show build information"
 	@echo "  size-comparison Compare binary sizes with different optimizations"
+	@echo "  toc		  Generate TOC for README.md" (requires doctoc)
 	@echo "  help         Show this help message"
 	@echo ""
 	@echo "Examples:"
