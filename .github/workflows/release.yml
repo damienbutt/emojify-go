@@ -43,7 +43,7 @@ jobs:
       - name: Install Rust tools
         run: |
           cargo install git-cliff
-          cargo install typos
+          cargo install typos-cli
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

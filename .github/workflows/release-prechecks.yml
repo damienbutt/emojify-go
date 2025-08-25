@@ -46,7 +46,7 @@ jobs:
       - name: Install Rust tools
         run: |
           cargo install git-cliff
-          cargo install typos
+          cargo install typos-cli
 
       - name: Install Nix
         uses: cachix/install-nix-action@v31
