@@ -21,7 +21,8 @@ COPY . .
 # TARGETOS and TARGETARCH are provided by Docker buildx and are crucial for cross-compilation.
 ARG TARGETOS TARGETARCH
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
-    -ldflags="-s -w" \
+    -ldflags="-s -w" -trimpath \
+    -gcflags="all=-l" \
     -o /build/emojify \
     ./cmd/emojify
 

@@ -18,6 +18,10 @@ builds:
     goarch:
       - amd64
       - arm64
+    flags:
+      - -trimpath
+    gcflags:
+      - all=-l
     ldflags:
       - -s -w -X github.com/damienbutt/emojify-go/internal/version.Version={{.Version}}
       - -X github.com/damienbutt/emojify-go/internal/version.Commit={{.Commit}}
