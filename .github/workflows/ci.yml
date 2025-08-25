@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: read
       statuses: write
+    secrets: inherit
 
   build:
     name: Build Cross-Platform
