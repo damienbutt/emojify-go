@@ -115,6 +115,7 @@ check_tool "go"
 check_tool "git"
 check_tool "gpg"
 check_tool "nix-hash"
+check_tool "git-cliff"
 echo ""
 
 print_status "5. 📊 Validation Summary"
