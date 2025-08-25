@@ -48,8 +48,15 @@ jobs:
 
       - name: Install Rust tools
         run: |
-          cargo install git-cliff
-          cargo install typos-cli
+          if ! command -v git-cliff &> /dev/null
+          then
+              cargo install git-cliff --force
+          fi
+
+          if ! command -v typos &> /dev/null
+          then
+              cargo install typos-cli --force
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
