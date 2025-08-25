@@ -102,10 +102,10 @@ echo ""
 # 3. Required repositories check
 print_status "3. 🏗️ Checking Required Repositories..."
 
-check_github_repo "damienbutt/homebrew-tap" "Homebrew formula repository" "GITHUB_TOKEN"
-check_github_repo "damienbutt/scoop-bucket" "Scoop bucket repository" "GITHUB_TOKEN"
-check_github_repo "damienbutt/winget-pkgs" "Winget package repository" "GITHUB_TOKEN"
-check_github_repo "damienbutt/nur" "Nix User Repository (NUR)" "GITHUB_TOKEN"
+check_github_repo "damienbutt/homebrew-tap" "Homebrew formula repository" "$GITHUB_TOKEN"
+check_github_repo "damienbutt/scoop-bucket" "Scoop bucket repository" "$GITHUB_TOKEN"
+check_github_repo "damienbutt/winget-pkgs" "Winget package repository" "$GITHUB_TOKEN"
+check_github_repo "damienbutt/nur" "Nix User Repository (NUR)" "$GITHUB_TOKEN"
 echo ""
 
 # 4. Check build tools
@@ -136,7 +136,6 @@ if [ ${#MISSING_SECRETS[@]} -eq 0 ] && \
         done
     fi
 else
-    echo -e "${RED}❌ Missing required prerequisites:${NC}"
     print_error "Missing required prerequisites:"
 
     if [ ${#MISSING_SECRETS[@]} -gt 0 ]; then
