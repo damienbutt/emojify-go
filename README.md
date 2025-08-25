@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/damienbutt/emojify-go/workflows/CI/badge.svg)](https://github.com/damienbutt/emojify-go/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/damienbutt/emojify-go)](https://goreportcard.com/report/github.com/damienbutt/emojify-go)
-[![codecov](https://codecov.io/gh/damienbutt/emojify-go/branch/main/graph/badge.svg)](https://codecov.io/gh/damienbutt/emojify-go)
+[![codecov](https://codecov.io/gh/damienbutt/emojify-go/branch/master/graph/badge.svg)](https://codecov.io/gh/damienbutt/emojify-go)
 [![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)](https://golang.org)
 [![Release](https://img.shields.io/github/v/release/damienbutt/emojify-go)](https://github.com/damienbutt/emojify-go/releases)
 [![Downloads](https://img.shields.io/github/downloads/damienbutt/emojify-go/total.svg)](https://github.com/damienbutt/emojify-go/releases)
