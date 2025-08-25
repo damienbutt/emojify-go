@@ -1,5 +1,7 @@
 version: 2
 
+project_name: emojify-go
+
 before:
   hooks:
     - make clean
@@ -127,6 +129,17 @@ winget:
           owner: microsoft
           name: winget-pkgs
           branch: master
+
+nix:
+  - repository:
+      owner: "damienbutt"
+      name: nur
+      token: "{{ .Env.RELEASE_TOKEN }}"
+    homepage: https://github.com/damienbutt/emojify-go
+    description: Lighting fast Emoji conversion on the command line 😱
+    license: mit
+    extra_install: |-
+      installManPage ./man/emojify.1.gz
 
 aurs:
   - name: emojify-go-bin

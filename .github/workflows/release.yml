@@ -55,6 +55,9 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
 
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
