@@ -5,9 +5,9 @@
 # Configuration options are organized into tables and keys.
 # See documentation for more information on available options.
 
-# [remote.github]
-# owner = "damienbutt"
-# repo = "emojify-go"
+[remote.github]
+owner = "damienbutt"
+repo = "emojify-go"
 
 [changelog]
 # template for the changelog header

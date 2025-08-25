@@ -40,8 +40,13 @@ jobs:
           version: "~> v2"
           install-only: true
 
-      - name: Set up git-cliff
-        uses: kenji-miyake/setup-git-cliff@v2
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Install Rust tools
+        run: |
+          cargo install git-cliff
+          cargo install typos
 
       - name: Install Nix
         uses: cachix/install-nix-action@v31
