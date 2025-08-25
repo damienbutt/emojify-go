@@ -113,10 +113,25 @@ print_status "4. 🔧 Checking Build Tools..."
 
 check_tool "go"
 check_tool "git"
+check_tool "gh"
 check_tool "gpg"
 check_tool "nix-hash"
 check_tool "git-cliff"
 check_tool "typos"
+
+if command -v go &> /dev/null; then
+    GO_VERSION=$(go version | cut -d' ' -f3 | sed 's/go//')
+    print_success "Go version: $GO_VERSION"
+fi
+
+# Check gh tool exists and is authenticated
+if command -v gh &> /dev/null && gh auth status &> /dev/null; then
+    print_success "GitHub CLI is authenticated"
+else
+    print_error "GitHub CLI is not authenticated"
+    MISSING_TOOLS+=("gh (not authenticated)")
+fi
+
 echo ""
 
 print_status "5. 📊 Validation Summary"
@@ -126,9 +141,6 @@ if [ ${#MISSING_SECRETS[@]} -eq 0 ] && \
     [ ${#MISSING_REPOS[@]} -eq 0 ] && \
     [ ${#MISSING_TOOLS[@]} -eq 0 ]; then
     print_success "🎉 All required prerequisites are in place!"
-
-    # GO_VERSION=$(go version | cut -d' ' -f3 | sed 's/go//')
-    # print_success "Go version: $GO_VERSION"
 
     if [ ${#WARNINGS[@]} -gt 0 ]; then
         echo -e "\n${YELLOW}⚠️  Optional items:${NC}"
