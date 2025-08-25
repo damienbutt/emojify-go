@@ -94,14 +94,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.out
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: true
-          slug: ${{ github.repository }}
-          verbose: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   integration:
     name: Integration Tests
