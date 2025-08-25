@@ -124,12 +124,13 @@ if command -v go &> /dev/null; then
     print_success "Go version: $GO_VERSION"
 fi
 
-# Check gh tool exists and is authenticated
-if command -v gh &> /dev/null && gh auth status &> /dev/null; then
-    print_success "GitHub CLI is authenticated"
-else
-    print_error "GitHub CLI is not authenticated"
-    MISSING_TOOLS+=("gh (not authenticated)")
+if command -v gh &> /dev/null; then
+    if gh auth status &> /dev/null; then
+        print_success "GitHub CLI is authenticated"
+    else
+        print_error "GitHub CLI is not authenticated"
+        MISSING_TOOLS+=("gh (not authenticated)")
+    fi
 fi
 
 echo ""
