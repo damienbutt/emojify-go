@@ -124,7 +124,6 @@ winget:
       pull_request:
         enabled: true
         draft: false
-        # check_boxes: true
         base:
           owner: microsoft
           name: winget-pkgs
@@ -219,9 +218,9 @@ aur_sources:
 
 dockers:
   - image_templates:
-      - "ghcr.io/damienbutt/emojify:{{ .Version }}-amd64"
-      - "ghcr.io/damienbutt/emojify:latest-amd64"
-    dockerfile: Dockerfile.goreleaser
+      - "ghcr.io/damienbutt/emojify-go:{{ .Version }}-amd64"
+      - "ghcr.io/damienbutt/emojify-go:latest-amd64"
+    dockerfile: Dockerfile
     use: buildx
     build_flag_templates:
       - "--pull"
@@ -229,27 +228,19 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--platform=linux/amd64"
-  - image_templates:
-      - "ghcr.io/damienbutt/emojify:{{ .Version }}-arm64"
-      - "ghcr.io/damienbutt/emojify:latest-arm64"
-    dockerfile: Dockerfile.goreleaser
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--platform=linux/arm64"
-    goarch: arm64
+      - "--platform=linux/amd64,linux/arm64"
+    extra_files:
+      - go.mod
+      - go.sum
+      - cmd
+      - internal
 
 docker_manifests:
-  - name_template: "ghcr.io/damienbutt/emojify:{{ .Version }}"
+  - name_template: "ghcr.io/damienbutt/emojify-go:{{ .Version }}"
     image_templates:
-      - "ghcr.io/damienbutt/emojify:{{ .Version }}-amd64"
-      - "ghcr.io/damienbutt/emojify:{{ .Version }}-arm64"
-  - name_template: "ghcr.io/damienbutt/emojify:latest"
+      - "ghcr.io/damienbutt/emojify-go:{{ .Version }}-amd64"
+      - "ghcr.io/damienbutt/emojify-go:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/damienbutt/emojify-go:latest"
     image_templates:
-      - "ghcr.io/damienbutt/emojify:latest-amd64"
-      - "ghcr.io/damienbutt/emojify:latest-arm64"
+      - "ghcr.io/damienbutt/emojify-go:latest-amd64"
+      - "ghcr.io/damienbutt/emojify-go:latest-arm64"

@@ -13,23 +13,3 @@ services:
     image: ghcr.io/damienbutt/emojify-go:latest
     container_name: emojify-go
     restart: never
-
-  # Development service for local testing
-  emojify-dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: builder
-    image: emojify-go:dev
-    container_name: emojify-dev
-    volumes:
-      - .:/app
-    working_dir: /app
-    command: ["sleep", "infinity"]
-    profiles:
-      - dev
-
-# Networks (optional)
-networks:
-  default:
-    name: emojify-network

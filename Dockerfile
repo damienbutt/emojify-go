@@ -1,36 +1,40 @@
-# Build stage
-FROM golang:1.25.0-alpine AS builder
+# STAGE 1: base
+# This stage prepares the minimal dependencies for our final image.
+FROM --platform=$BUILDPLATFORM alpine:latest AS base
+RUN apk --no-cache add ca-certificates tzdata
 
-# Install build dependencies
-RUN apk add --no-cache git ca-certificates tzdata
+# STAGE 2: builder
+# This stage builds the Go binary.
+FROM --platform=$BUILDPLATFORM golang:1.25.0-alpine AS builder
 
-# Set working directory
-WORKDIR /app
+# Set the working directory inside the container.
+WORKDIR /src
 
-# Copy go mod files first for better caching
+# Copy the Go module files and download dependencies.
 COPY go.mod go.sum ./
-
-# Download dependencies
 RUN go mod download
 
-# Copy source code
+# Copy the rest of your source code.
 COPY . .
 
-# Build the binary
-RUN CGO_ENABLED=0 GOOS=linux go build \
+# Build the Go binary.
+# TARGETOS and TARGETARCH are provided by Docker buildx and are crucial for cross-compilation.
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -ldflags="-s -w" \
-    -o emojify \
+    -o /build/emojify \
     ./cmd/emojify
 
-# Final minimal image
+# STAGE 3: Final Image
+# This stage creates the final, minimal production image.
 FROM scratch
 
-# Copy certificates and timezone data from builder
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+# Copy the certificates and timezone data from our 'base' stage.
+COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=base /usr/share/zoneinfo /usr/share/zoneinfo
 
-# Copy the binary from builder
-COPY --from=builder /app/emojify /emojify
+# Copy the compiled binary from the 'builder' stage.
+COPY --from=builder /build/emojify /emojify
 
-# Set the binary as entrypoint
+# Set the binary as the entrypoint for the container.
 ENTRYPOINT ["/emojify"]
