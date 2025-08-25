@@ -11,6 +11,7 @@ NC='\033[0m'
 MISSING_SECRETS=()
 MISSING_REPOS=()
 MISSING_TOOLS=()
+MISSING_AUTH=()
 WARNINGS=()
 
 print_status() {
@@ -70,6 +71,27 @@ check_tool() {
     fi
 }
 
+check_gh_auth() {
+    if gh auth status &> /dev/null; then
+        print_success "GitHub CLI is authenticated"
+    else
+        MISSING_AUTH+=("gh")
+        print_error "GitHub CLI is not authenticated"
+    fi
+}
+
+check_ghcr_auth() {
+    local token="$1"
+    local actor="$2"
+
+    if echo "${token}" | docker login ghcr.io -u "${actor}" --password-stdin &> /dev/null; then
+        print_success "Authenticated with GHCR"
+    else
+        MISSING_AUTH+=("GHCR")
+        print_error "Failed to authenticate with GHCR"
+    fi
+}
+
 # 1. Configuration validation
 print_status "1. 🔍 Validating GoReleaser Configuration..."
 
@@ -102,10 +124,10 @@ echo ""
 # 3. Required repositories check
 print_status "3. 🏗️ Checking Required Repositories..."
 
-check_github_repo "damienbutt/homebrew-tap" "Homebrew formula repository" "$GITHUB_TOKEN"
-check_github_repo "damienbutt/scoop-bucket" "Scoop bucket repository" "$GITHUB_TOKEN"
-check_github_repo "damienbutt/winget-pkgs" "Winget package repository" "$GITHUB_TOKEN"
-check_github_repo "damienbutt/nur" "Nix User Repository (NUR)" "$GITHUB_TOKEN"
+check_github_repo "damienbutt/homebrew-tap" "Homebrew formula repository" "${GITHUB_TOKEN}"
+check_github_repo "damienbutt/scoop-bucket" "Scoop bucket repository" "${GITHUB_TOKEN}"
+check_github_repo "damienbutt/winget-pkgs" "Winget package repository" "${GITHUB_TOKEN}"
+check_github_repo "damienbutt/nur" "Nix User Repository (NUR)" "${GITHUB_TOKEN}"
 echo ""
 
 # 4. Check build tools
@@ -124,23 +146,24 @@ if command -v go &> /dev/null; then
     print_success "Go version: $GO_VERSION"
 fi
 
-if command -v gh &> /dev/null; then
-    if gh auth status &> /dev/null; then
-        print_success "GitHub CLI is authenticated"
-    else
-        print_error "GitHub CLI is not authenticated"
-        MISSING_TOOLS+=("gh (not authenticated)")
-    fi
-fi
-
 echo ""
 
-print_status "5. 📊 Validation Summary"
+print_status "5. 🔐 Checking Authentication..."
+
+if command -v gh &> /dev/null; then
+    check_gh_auth
+fi
+
+check_ghcr_auth "${GITHUB_TOKEN}" "${GITHUB_ACTOR}"
+echo ""
+
+print_status "6. 📊 Validation Summary"
 echo "======================"
 
 if [ ${#MISSING_SECRETS[@]} -eq 0 ] && \
     [ ${#MISSING_REPOS[@]} -eq 0 ] && \
-    [ ${#MISSING_TOOLS[@]} -eq 0 ]; then
+    [ ${#MISSING_TOOLS[@]} -eq 0 ] && \
+    [ ${#MISSING_AUTH[@]} -eq 0 ]; then
     print_success "🎉 All required prerequisites are in place!"
 
     if [ ${#WARNINGS[@]} -gt 0 ]; then
@@ -174,25 +197,32 @@ else
         done
     fi
 
+    if [ ${#MISSING_AUTH[@]} -gt 0 ]; then
+        echo -e "\n${RED}❌ Missing Authentication:${NC}"
+        for auth in "${MISSING_AUTH[@]}"; do
+            echo -e "${RED}   • $auth${NC}"
+        done
+    fi
+
     exit 1
 fi
 
-# 6. GoReleaser Test (without publishing)
-print_status "6. Testing GoReleaser process (no publishing)..."
+# 7. GoReleaser Test (without publishing)
+print_status "7. Testing GoReleaser process (no publishing)..."
 
-# Base skip flags - always skip these for testing
 SKIP_FLAGS="--skip=publish"
+GO_RELEASER_SUCCESS=false
 
 if go tool goreleaser release --snapshot --clean $SKIP_FLAGS --verbose; then
     print_success "GoReleaser process completed successfully"
+    GO_RELEASER_SUCCESS=true
 else
     print_error "GoReleaser process failed"
-    exit 1
 fi
 echo ""
 
-# 6. Summary
-print_status "📋 Test Summary"
+# 8. Summary
+print_status "8. 📋 Test Summary"
 echo "==============="
 echo ""
 
@@ -200,6 +230,15 @@ print_success "GoReleaser configuration is valid."
 print_success "All required secrets are present."
 print_success "All required repositories are accessible."
 print_success "All required build tools are installed."
-print_success "GoReleaser release process completed successfully."
+print_success "GitHub CLI is authenticated."
+print_success "Authenticated with GHCR."
+
+if [ "$GO_RELEASER_SUCCESS" = true ]; then
+    print_success "GoReleaser release process completed successfully."
+else
+    print_error "GoReleaser process failed."
+    exit 1
+fi
+
 echo ""
 print_success "🚀 Ready to release!"
