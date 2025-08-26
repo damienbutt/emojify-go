@@ -109,7 +109,7 @@ check_token_contents_permission() {
 
     # Create a new branch
     local http_status_create
-    http_status_create=$(curl -s -o /dev/null -w "%{{http_code}}" \
+    http_status_create=$(curl -s -o /dev/null -w "%{http_code}" \
         -X POST \
         -H "Authorization: token $token" \
         -d "{{\"ref\":\"refs/heads/$branch_name\",\"sha\":\"$sha\"}}" \
@@ -145,7 +145,7 @@ check_token_pr_permission() {
     fi
 
     local http_status
-    http_status=$(curl -s -o /dev/null -w "%{{http_code}}" \
+    http_status=$(curl -s -o /dev/null -w "%{http_code}" \
         -X POST \
         -H "Authorization: token $token" \
         -d '{"title":"Test PR","head":"test-branch","base":"master","draft":true}' \
