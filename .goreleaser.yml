@@ -111,6 +111,7 @@ scoops:
       owner: damienbutt
       name: scoop-bucket
       token: "{{ .Env.RELEASE_TOKEN }}"
+    directory: bucket
     homepage: https://github.com/damienbutt/emojify-go
     description: Lighting fast Emoji conversion on the command line 😱
     license: MIT
@@ -125,13 +126,6 @@ winget:
       owner: "damienbutt"
       name: winget-pkgs
       token: "{{ .Env.RELEASE_TOKEN }}"
-      pull_request:
-        enabled: true
-        draft: false
-        base:
-          owner: microsoft
-          name: winget-pkgs
-          branch: master
 
 nix:
   - repository:

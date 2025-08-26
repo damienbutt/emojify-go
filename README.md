@@ -132,9 +132,17 @@ sudo rpm -i https://github.com/damienbutt/emojify-go/releases/latest/download/em
 
 ```powershell
 # Scoop
+# 1. Add the bucket (only needs to be done once)
+scoop bucket add damienbutt https://github.com/damienbutt/scoop-bucket.git
+
+# 2. Install the package
 scoop install emojify-go
 
 # WinGet
+# 1. Add the source repository (only needs to be done once)
+winget source add --name damienbutt --arg https://github.com/damienbutt/winget-pkgs --type Microsoft.Winget.Source.8wekyb3d8bbwe
+
+# 2. Install the package
 winget install damienbutt.emojify-go
 ```
 
