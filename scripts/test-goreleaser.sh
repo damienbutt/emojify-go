@@ -112,7 +112,7 @@ check_token_contents_permission() {
     http_status_create=$(curl -s -o /dev/null -w "%{http_code}" \
         -X POST \
         -H "Authorization: token $token" \
-        -d "{{\"ref\":\"refs/heads/$branch_name\",\"sha\":\"$sha\"}}" \
+        -d "{\"ref\":\"refs/heads/$branch_name\",\"sha\":\"$sha\"}" \
         "https://api.github.com/repos/$repo/git/refs")
 
     if [ "$http_status_create" -eq 201 ]; then
