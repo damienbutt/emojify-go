@@ -118,7 +118,7 @@ check_token_contents_permission() {
     if [ "$http_status_create" -eq 201 ]; then
         # Delete the branch
         local http_status_delete
-        http_status_delete=$(curl -s -o /dev/null -w "%{{http_code}}" \
+        http_status_delete=$(curl -s -o /dev/null -w "%{http_code}" \
             -X DELETE \
             -H "Authorization: token $token" \
             "https://api.github.com/repos/$repo/git/refs/heads/$branch_name")
