@@ -225,6 +225,7 @@ check_tool "gpg"
 check_tool "nix-hash"
 check_tool "git-cliff"
 check_tool "typos"
+check_tool "curl"
 check_tool "jq"
 
 if command -v go &> /dev/null; then
