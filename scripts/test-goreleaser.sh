@@ -103,21 +103,34 @@ check_token_contents_permission() {
     fi
 
     local sha
-    sha=$(gh api "repos/$repo/git/ref/heads/master" --jq '.object.sha')
+    sha=$(curl -s -H "Authorization: token $token" "https://api.github.com/repos/$repo/git/ref/heads/master" | jq -r '.object.sha')
 
     local branch_name="test-branch"
 
     # Create a new branch
-    if gh api "repos/$repo/git/refs" -f ref="refs/heads/$branch_name" -f sha="$sha" --silent > /dev/null; then
+    local http_status_create
+    http_status_create=$(curl -s -o /dev/null -w "%{{http_code}}" \
+        -X POST \
+        -H "Authorization: token $token" \
+        -d "{{\"ref\":\"refs/heads/$branch_name\",\"sha\":\"$sha\"}}" \
+        "https://api.github.com/repos/$repo/git/refs")
+
+    if [ "$http_status_create" -eq 201 ]; then
         # Delete the branch
-        if gh api "repos/$repo/git/refs/heads/$branch_name" -X DELETE --silent > /dev/null; then
+        local http_status_delete
+        http_status_delete=$(curl -s -o /dev/null -w "%{{http_code}}" \
+            -X DELETE \
+            -H "Authorization: token $token" \
+            "https://api.github.com/repos/$repo/git/refs/heads/$branch_name")
+
+        if [ "$http_status_delete" -eq 204 ]; then
             print_success "contents:write permission verified for $repo"
         else
-            print_error "Failed to delete branch in $repo"
+            print_error "Failed to delete branch in $repo (HTTP status: $http_status_delete)"
             MISSING_PERMISSIONS+=("$token_name (failed to delete branch in $repo)")
         fi
     else
-        print_error "Failed to create branch in $repo"
+        print_error "Failed to create branch in $repo (HTTP status: $http_status_create)"
         MISSING_PERMISSIONS+=("$token_name (failed to create branch in $repo)")
     fi
 }
@@ -132,7 +145,11 @@ check_token_pr_permission() {
     fi
 
     local http_status
-    http_status=$(gh api "repos/$repo/pulls" -f title="Test PR" -f head="test-branch" -f base="master" -f draft=true -i 2>&1 | grep "HTTP/2" | awk '{print $2}')
+    http_status=$(curl -s -o /dev/null -w "%{{http_code}}" \
+        -X POST \
+        -H "Authorization: token $token" \
+        -d '{"title":"Test PR","head":"test-branch","base":"master","draft":true}' \
+        "https://api.github.com/repos/$repo/pulls")
 
     if [ "$http_status" -eq 422 ]; then
         print_success "pull_requests:write permission verified for $repo"
@@ -319,7 +336,7 @@ else
 fi
 echo ""
 
-# 8. Summary
+# 9. Summary
 print_status "9. 📋 Test Summary"
 echo "==============="
 echo ""
