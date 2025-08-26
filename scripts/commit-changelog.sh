@@ -20,11 +20,12 @@ if [[ -n "$(git status --porcelain CHANGELOG.md)" ]]; then
     git add CHANGELOG.md
     git commit -m "chore: update CHANGELOG.md for $TAG [skip ci]"
 
-    # Push to the current branch (usually master/main)
-    CURRENT_BRANCH=$(git branch --show-current)
-    git push origin HEAD:"$CURRENT_BRANCH"
+    # Determine the default branch from the remote 'origin'
+    # This is more reliable in CI environments (detached HEAD)
+    DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+    git push origin HEAD:"$DEFAULT_BRANCH"
 
-    echo "✅ CHANGELOG.md committed and pushed to $CURRENT_BRANCH"
+    echo "✅ CHANGELOG.md committed and pushed to $DEFAULT_BRANCH"
 else
     echo "ℹ️  No changes to CHANGELOG.md to commit"
 fi
