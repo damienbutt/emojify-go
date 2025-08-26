@@ -151,7 +151,7 @@ aurs:
     maintainers:
       - Damien Butt <22627489+damienbutt@users.noreply.github.com>
     license: MIT
-    private_key: "{{ .Env.AUR_KEY }}"
+    private_key: "{{ .Env.AUR_SSH_PRIVATE_KEY }}"
     git_url: ssh://aur@aur.archlinux.org/emojify-go-bin.git
     provides:
       - emojify
@@ -176,7 +176,7 @@ aur_sources:
     maintainers:
       - Damien Butt <22627489+damienbutt@users.noreply.github.com>
     license: MIT
-    private_key: "{{ .Env.AUR_KEY }}"
+    private_key: "{{ .Env.AUR_SSH_PRIVATE_KEY }}"
     git_url: ssh://aur@aur.archlinux.org/emojify-go.git
     provides:
       - emojify
