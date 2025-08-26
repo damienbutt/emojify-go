@@ -12,6 +12,7 @@ MISSING_SECRETS=()
 MISSING_REPOS=()
 MISSING_TOOLS=()
 MISSING_AUTH=()
+MISSING_PERMISSIONS=()
 WARNINGS=()
 
 print_status() {
@@ -92,6 +93,72 @@ check_ghcr_auth() {
     fi
 }
 
+check_token_contents_permission() {
+    local token="$1"
+    local repo="$2"
+    local token_name="$3"
+
+    if [ -z "$token" ]; then
+        return
+    fi
+
+    local sha
+    sha=$(gh api "repos/$repo/git/ref/heads/master" --jq '.object.sha')
+
+    local branch_name="test-branch"
+
+    # Create a new branch
+    if gh api "repos/$repo/git/refs" -f ref="refs/heads/$branch_name" -f sha="$sha" --silent > /dev/null; then
+        # Delete the branch
+        if gh api "repos/$repo/git/refs/heads/$branch_name" -X DELETE --silent > /dev/null; then
+            print_success "contents:write permission verified for $repo"
+        else
+            print_error "Failed to delete branch in $repo"
+            MISSING_PERMISSIONS+=("$token_name (failed to delete branch in $repo)")
+        fi
+    else
+        print_error "Failed to create branch in $repo"
+        MISSING_PERMISSIONS+=("$token_name (failed to create branch in $repo)")
+    fi
+}
+
+check_token_pr_permission() {
+    local token="$1"
+    local repo="$2"
+    local token_name="$3"
+
+    if [ -z "$token" ]; then
+        return
+    fi
+
+    local http_status
+    http_status=$(gh api "repos/$repo/pulls" -f title="Test PR" -f head="test-branch" -f base="master" -f draft=true -i 2>&1 | grep "HTTP/2" | awk '{print $2}')
+
+    if [ "$http_status" -eq 422 ]; then
+        print_success "pull_requests:write permission verified for $repo"
+    elif [ "$http_status" -eq 403 ]; then
+        print_error "Failed to create draft PR on $repo (HTTP status: $http_status). This indicates a permission issue."
+        MISSING_PERMISSIONS+=("$token_name (failed to create draft PR on $repo)")
+    else
+        print_error "Unexpected error when creating a draft PR on $repo (HTTP status: $http_status)"
+        MISSING_PERMISSIONS+=("$token_name (unexpected error when creating a draft PR on $repo)")
+    fi
+}
+
+check_goreleaser_env_vars() {
+    print_status "Checking for referenced environment variables in .goreleaser.yml..."
+
+    local env_vars
+    env_vars=$(grep -oP '(?<={{ .Env.)\w+(?= }})' .goreleaser.yml | sort -u)
+
+    for var in $env_vars; do
+        if [ -z "${!var}" ]; then
+            MISSING_SECRETS+=("$var - Referenced in .goreleaser.yml but not set")
+            print_error "Missing: $var"
+        fi
+    done
+}
+
 # 1. Configuration validation
 print_status "1. 🔍 Validating GoReleaser Configuration..."
 
@@ -109,6 +176,7 @@ else
     }
 fi
 
+check_goreleaser_env_vars
 echo ""
 
 # 2. Required secrets check
@@ -140,6 +208,7 @@ check_tool "gpg"
 check_tool "nix-hash"
 check_tool "git-cliff"
 check_tool "typos"
+check_tool "jq"
 
 if command -v go &> /dev/null; then
     GO_VERSION=$(go version | cut -d' ' -f3 | sed 's/go//')
@@ -157,13 +226,34 @@ fi
 check_ghcr_auth "${GITHUB_TOKEN}" "${GITHUB_ACTOR}"
 echo ""
 
-print_status "6. 📊 Validation Summary"
+print_status "6. 🔑 Checking Release Token Permissions..."
+
+if [ -z "${RELEASE_TOKEN}" ]; then
+    print_warning "RELEASE_TOKEN is not set; skipping permission checks"
+    WARNINGS+=("RELEASE_TOKEN is not set; skipping permission checks")
+else
+    REPOS_TO_CHECK=(
+        "damienbutt/homebrew-tap"
+        "damienbutt/scoop-bucket"
+        "damienbutt/winget-pkgs"
+        "damienbutt/nur"
+    )
+
+    for repo in "${REPOS_TO_CHECK[@]}"; do
+        check_token_contents_permission "${RELEASE_TOKEN}" "$repo" "RELEASE_TOKEN"
+        check_token_pr_permission "${RELEASE_TOKEN}" "$repo" "RELEASE_TOKEN"
+    done
+fi
+echo ""
+
+print_status "7. 📊 Validation Summary"
 echo "======================"
 
 if [ ${#MISSING_SECRETS[@]} -eq 0 ] && \
     [ ${#MISSING_REPOS[@]} -eq 0 ] && \
     [ ${#MISSING_TOOLS[@]} -eq 0 ] && \
-    [ ${#MISSING_AUTH[@]} -eq 0 ]; then
+    [ ${#MISSING_AUTH[@]} -eq 0 ] && \
+    [ ${#MISSING_PERMISSIONS[@]} -eq 0 ]; then
     print_success "🎉 All required prerequisites are in place!"
 
     if [ ${#WARNINGS[@]} -gt 0 ]; then
@@ -204,11 +294,19 @@ else
         done
     fi
 
+    if [ ${#MISSING_PERMISSIONS[@]} -gt 0 ]; then
+        echo -e "\n${RED}❌ Missing Permissions:${NC}"
+        for permission in "${MISSING_PERMISSIONS[@]}"; do
+            echo -e "${RED}   • $permission${NC}"
+        done
+    fi
+
     exit 1
 fi
 
-# 7. GoReleaser Test (without publishing)
-print_status "7. Testing GoReleaser process (no publishing)..."
+# 8. GoReleaser Test (without publishing)
+print_status "8. 🧪 Testing GoReleaser process (no publishing)..."
+
 
 SKIP_FLAGS="--skip=publish"
 GO_RELEASER_SUCCESS=false
@@ -222,7 +320,7 @@ fi
 echo ""
 
 # 8. Summary
-print_status "8. 📋 Test Summary"
+print_status "9. 📋 Test Summary"
 echo "==============="
 echo ""
 
@@ -230,6 +328,7 @@ print_success "GoReleaser configuration is valid."
 print_success "All required secrets are present."
 print_success "All required repositories are accessible."
 print_success "All required build tools are installed."
+print_success "All release token permissions are verified."
 print_success "GitHub CLI is authenticated."
 print_success "Authenticated with GHCR."
 
