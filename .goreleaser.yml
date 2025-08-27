@@ -180,28 +180,27 @@ aur_sources:
       - go
       - git
     prepare: |-
-      cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
-
-      # Set up Go environment for reproducible builds
-      export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
-      export CGO_ENABLED=0
+      cd "$srcdir"
 
       # Download dependencies
       go mod download
     build: |-
-      cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
+      cd "$srcdir"
 
       # Build the binary with proper flags
       export CGO_ENABLED=0
-      export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
-      export LDFLAGS="-linkmode=external -extldflags \"${LDFLAGS}\""
 
       go build \
-        -ldflags="-s -w -X github.com/damienbutt/emojify-go/internal/version.Version={{ .Version }} -X github.com/damienbutt/emojify-go/internal/version.Commit={{ .Commit }} -X github.com/damienbutt/emojify-go/internal/version.Date={{ .Date }} -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=makepkg ${LDFLAGS}" \
+        -ldflags="-s -w -X github.com/damienbutt/emojify-go/internal/version.Version={{ .Version }} \
+          -X github.com/damienbutt/emojify-go/internal/version.Commit={{ .Commit }} \
+          -X github.com/damienbutt/emojify-go/internal/version.Date={{ .Date }} \
+          -X github.com/damienbutt/emojify-go/internal/version.BuiltBy=makepkg" \
+        -trimpath \
+        -gcflags="all=-l" \
         -o emojify \
         ./cmd/emojify
     package: |-
-      cd "$srcdir/{{ .ProjectName }}-{{ .Version }}"
+      cd "$srcdir"
 
       # Install binary
       install -Dm755 emojify "${pkgdir}/usr/bin/emojify"
