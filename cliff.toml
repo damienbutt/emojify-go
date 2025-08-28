@@ -39,18 +39,25 @@ body = """
     {%- endif -%}
 {% endif %}
 
-{%- for group, commits in commits | group_by(attribute="group") %}
+{%- if previous.version -%}
+    {%- for group, commits in commits | group_by(attribute="group") %}
 
-    ### {{ group | striptags | trim | upper_first }}
-    {%- for commit in commits | filter(attribute="scope") | sort(attribute="scope") %}
-        {{ self::print_commit(commit=commit) }}
-    {%- endfor %}
-    {%- for commit in commits %}
-        {% if not commit.scope %}
+        ### {{ group | striptags | trim | upper_first }}
+        {%- for commit in commits | filter(attribute="scope") | sort(attribute="scope") %}
             {{ self::print_commit(commit=commit) }}
-        {%- endif %}
-    {%- endfor %}
-{%- endfor -%}
+        {%- endfor %}
+        {%- for commit in commits %}
+            {% if not commit.scope %}
+                {{ self::print_commit(commit=commit) }}
+            {%- endif %}
+        {%- endfor %}
+    {%- endfor -%}
+{% else %}
+
+### 🎉🎉 Initial Release
+
+First official release of emojify-go, a lighting fast Emoji converter for the command line 😱.
+{%- endif %}
 
 {%- if github %}
     {%- set excluded_users = ["Norgate-AV", "damienbutt", "actions-user", "github-actions", "github-actions[bot]"] %}
