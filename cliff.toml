@@ -12,8 +12,10 @@ repo = "emojify-go"
 [changelog]
 # template for the changelog header
 header = """
-# Changelog\n
-All notable changes to this project will be documented in this file.\n
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
 """
 # template for the changelog body
 # https://keats.github.io/tera/docs/#introduction
@@ -35,51 +37,44 @@ body = """
     {%- else -%}
         ## [{{ version | trim_start_matches(pat="v") }}]({{ self::remote_url() }}/tree/{{ version }}) - {{ timestamp | date(format="%Y-%m-%d") }}
     {%- endif -%}
-{%- else -%}
-## [unreleased]
-{% endif -%}
+{% endif %}
 
-{%- if previous.version -%}
-    {%- for group, commits in commits | group_by(attribute="group") %}
-        ### {{ group | striptags | trim | upper_first }}
-        {%- for commit in commits | filter(attribute="scope") | sort(attribute="scope") %}
-            {{ self::print_commit(commit=commit) }}
-        {%- endfor -%}
-        {%- for commit in commits %}
-            {%- if not commit.scope -%}
-                {{ self::print_commit(commit=commit) }}
-            {%- endif -%}
-        {%- endfor -%}
-    {%- endfor -%}
-{%- else %}
-    ### 🎉🎉 Initial Release
+{%- for group, commits in commits | group_by(attribute="group") %}
 
-    First official release of emojify-go, a lighting fast Emoji converter for the command line 😱.
-{%- endif %}
-
-{%- if github -%}
-    {%- set excluded_users = ["Norgate-AV", "damienbutt", "actions-user", "github-actions", "github-actions[bot]"] -%}
-    {%- set first_time_contributors = [] -%}
-    {%- for contributor in github.contributors -%}
-        {%- if contributor.is_first_time -%}
-            {%- if contributor.username not in excluded_users -%}
-                {%- set first_time_contributors = first_time_contributors | concat(with=[contributor]) -%}
-            {%- endif -%}
-        {%- endif -%}
+    ### {{ group | striptags | trim | upper_first }}
+    {%- for commit in commits | filter(attribute="scope") | sort(attribute="scope") %}
+        {{ self::print_commit(commit=commit) }}
     {%- endfor %}
+    {%- for commit in commits %}
+        {% if not commit.scope %}
+            {{ self::print_commit(commit=commit) }}
+        {%- endif %}
+    {%- endfor %}
+{%- endfor -%}
 
+{%- if github %}
+    {%- set excluded_users = ["Norgate-AV", "damienbutt", "actions-user", "github-actions", "github-actions[bot]"] %}
+    {%- set first_time_contributors = [] %}
+    {%- for contributor in github.contributors %}
+        {%- if contributor.is_first_time %}
+            {%- if contributor.username not in excluded_users %}
+                {%- set first_time_contributors = first_time_contributors | concat(with=[contributor]) %}
+            {%- endif %}
+        {%- endif %}
+    {%- endfor %}
     {%- if first_time_contributors | length != 0 %}
         ## New Contributors ❤️
         {%- for contributor in first_time_contributors %}
             * @{{ contributor.username }} made their first contribution
             {%- if contributor.pr_number %} in [#{{ contributor.pr_number }}]({{ self::remote_url() }}/pull/{{ contributor.pr_number }})
-            {%- endif -%}
-        {%- endfor -%}
-    {%- endif -%}
-{%- endif -%}
+            {%- endif %}
+        {%- endfor %}
+    {%- endif %}
+{%- endif %}
 """
 # template for the changelog footer
-footer = ""
+footer = """
+"""
 # remove the leading and trailing s
 trim = true
 # postprocessors
