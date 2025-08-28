@@ -1,4 +1,4 @@
-.TH EMOJIFY 1 "August 2025" "emojify-go 1.0.0" "User Commands"
+.TH EMOJIFY 1 "August 2025" "emojify-go 1.0.1" "User Commands"
 .SH NAME
 emojify \- convert emoji aliases to Unicode emojis and vice versa
 .SH SYNOPSIS
@@ -6,7 +6,7 @@ emojify \- convert emoji aliases to Unicode emojis and vice versa
 [\fIOPTION\fR]... [\fITEXT\fR]
 .SH DESCRIPTION
 .B emojify
-is a lightning-fast command-line tool for converting emoji aliases (like :smile:) to Unicode emojis and vice versa. It can process text from arguments, standard input, or files.
+is a lightning-fast command-line tool for converting emoji aliases (like :smile:) to Unicode emojis and vice versa. It can process text from arguments or standard input.
 
 The tool supports over 2,500 emoji aliases and provides both encoding (aliases to emojis) and decoding (emojis to aliases) modes. It's designed for use in shell scripts, CI/CD pipelines, and text processing workflows.
 .SH OPTIONS
@@ -17,38 +17,8 @@ Convert emoji aliases to Unicode emojis (default behavior)
 .BR \-d ", " \-\-decode
 Convert Unicode emojis to emoji aliases
 .TP
-.BR \-f ", " \-\-file " " \fIFILE\fR
-Read input from specified file instead of arguments or stdin
-.TP
-.BR \-o ", " \-\-output " " \fIFILE\fR
-Write output to specified file instead of stdout
-.TP
-.BR \-s ", " \-\-strip
-Remove surrounding whitespace from output
-.TP
-.BR \-\-list
+.BR \-l ", " \-\-list
 List all available emoji aliases and their Unicode equivalents
-.TP
-.BR \-\-list-emojis
-List only the emoji Unicode characters
-.TP
-.BR \-\-list-aliases
-List only the emoji aliases
-.TP
-.BR \-\-search " " \fIPATTERN\fR
-Search for emojis matching the given pattern
-.TP
-.BR \-\-format " " \fIFORMAT\fR
-Output format: text (default), json, csv, yaml
-.TP
-.BR \-\-no-color
-Disable colored output
-.TP
-.BR \-q ", " \-\-quiet
-Suppress non-essential output
-.TP
-.BR \-v ", " \-\-verbose
-Enable verbose output
 .TP
 .BR \-\-version
 Display version information and exit
@@ -74,13 +44,6 @@ echo "Hello 👋 world ❗" | emojify --decode
 .IP
 Output: Hello :wave: world :exclamation:
 
-.SS File Processing
-Process a file and save output:
-.IP
-.EX
-emojify --file input.txt --output output.txt
-.EE
-
 .SS Pipeline Usage
 Use in shell pipelines:
 .IP
@@ -89,28 +52,10 @@ git log --oneline | emojify
 echo ":heart: CI/CD pipeline :white_check_mark:" | emojify
 .EE
 
-.SS Searching Emojis
-Find emojis by pattern:
-.IP
-.EX
-emojify --search "heart"
-emojify --search "^:smile"
-.EE
-
-.SS List Operations
-List available emojis:
+.SS List All Emojis
 .IP
 .EX
 emojify --list
-emojify --list-aliases | grep heart
-emojify --list-emojis
-.EE
-
-.SS Different Output Formats
-.IP
-.EX
-emojify --list --format json > emojis.json
-emojify --search "star" --format csv
 .EE
 .SH EXIT STATUS
 .B emojify
@@ -120,54 +65,33 @@ exits with one of the following values:
 Success
 .TP
 .B 1
-General error (invalid arguments, file not found, etc.)
-.TP
-.B 2
-Invalid emoji alias or Unicode character
-.TP
-.B 3
-File I/O error
+General error (invalid arguments, etc.)
 .SH ENVIRONMENT
 .TP
-.B EMOJIFY_CONFIG
-Path to custom configuration file (if supported)
-.TP
 .B NO_COLOR
-When set, disables colored output (equivalent to --no-color)
-.TP
-.B EMOJIFY_FORMAT
-Default output format (text, json, csv, yaml)
-.SH FILES
-.TP
-.I ~/.config/emojify/config.yaml
-User configuration file (if supported)
-.TP
-.I /etc/emojify/config.yaml
-System-wide configuration file (if supported)
+When set, disables colored output in terminal (if supported)
 .SH PERFORMANCE
 .B emojify
 is implemented in Go and provides significant performance improvements over shell-based alternatives:
 .IP \(bu 2
-Processes large files efficiently with streaming
+Fast emoji lookup using hash maps
+.IP \(bu 2
+Efficient streaming for large inputs
 .IP \(bu 2
 Minimal memory footprint
 .IP \(bu 2
-Optimized emoji lookup using hash maps
-.IP \(bu 2
-Concurrent processing for multiple files
+Zero external dependencies
 .SH EMOJI SUPPORT
 .B emojify
 supports over 2,500 emoji aliases from the GitHub emoji database, including:
 .IP \(bu 2
 Standard Unicode emojis (😀, 🎉, ❤️)
 .IP \(bu 2
-GitHub-specific aliases (:octocat:, :shipit:)
-.IP \(bu 2
-Skin tone variations (:thumbsup_light_skin_tone:)
+Skin tone variations (:thumbsup_tone1:, :thumbsup_tone2:, etc.)
 .IP \(bu 2
 Flag emojis (:flag_us:, :flag_gb:)
 .IP \(bu 2
-Custom aliases for common variations
+Common symbols and objects
 .SH COMPATIBILITY
 .B emojify
 is compatible with:
@@ -189,7 +113,7 @@ Online documentation: https://github.com/damienbutt/emojify-go
 .SH BUGS
 Report bugs at: https://github.com/damienbutt/emojify-go/issues
 .SH AUTHOR
-Damien Butt <damien@example.com>
+Damien Butt
 .SH COPYRIGHT
 Copyright (c) 2025 Damien Butt. Licensed under the MIT License.
 .PP
