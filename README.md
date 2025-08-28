@@ -30,6 +30,7 @@ git log --oneline | emojify | head -5
 ## :book: **Contents**
 
 - [:sparkles: Features](#sparkles-features)
+- [🎬 Demo](#-demo)
 - [:package: Installation](#package-installation)
   - [Package Managers (Recommended)](#package-managers-recommended)
   - [:whale: Docker](#whale-docker)
@@ -84,13 +85,13 @@ git log --oneline | emojify | head -5
 -   🛡️ **Production Ready**: Comprehensive tests, benchmarks, and error handling
 -   🎨 **Modern CLI**: Built with urfave/cli for excellent UX
 
-<!-- ## 🎬 Demo
+## 🎬 Demo
 
 <p align="center">
   <img src="./assets/img/demo.gif" alt="Emojify-Go Demo" width="800">
 </p>
 
-_Lightning-fast emoji conversion in action! See the 169.9x performance improvement over the original bash version._ -->
+_Lightning-fast emoji conversion in action! See the 169.9x performance improvement over the original bash version._
 
 ## :package: Installation
 

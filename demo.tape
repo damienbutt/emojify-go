@@ -62,21 +62,58 @@ Set Theme "Catppuccin Mocha"
 Set TypingSpeed 100ms
 Set WindowBar Colorful
 
-Type "# Emojify-Go Demo - Lightning Fast Emoji Conversion" Sleep 1s Enter Enter
+Type "# Emojify-Go Demo - Lightning Fast Emoji Conversion"
+Sleep 1s
+Enter
+Enter
+Sleep 1s
 
-Type "# Show version" Sleep 500ms Enter
-Type "./build/emojify --version" Sleep 500ms Enter Sleep 1s
+Type "# Show version"
+Sleep 500ms
+Enter
+Type "emojify --version"
+Sleep 500ms
+Enter
+Enter
+Sleep 3s
 
-Type "# Convert emoji aliases to Unicode" Sleep 500ms Enter
-Type 'echo "Hello :wave: world :rocket:" | ./build/emojify' Sleep 800ms Enter Sleep 2s
+Type "# Convert emoji aliases to Unicode"
+Sleep 500ms
+Enter
+Type 'echo "Hello :wave: world :rocket:" | emojify'
+Sleep 500ms
+Enter
+Enter
+Sleep 3s
 
-Type "# Works great with git logs" Sleep 500ms Enter
-Type 'echo "feat: add new feature :sparkles:" | ./build/emojify' Sleep 800ms Enter Sleep 2s
+Type "# Works great with git logs"
+Sleep 500ms
+Enter
+Type 'echo "feat: add new feature :sparkles:" | emojify'
+Sleep 500ms
+Enter
+Enter
+Sleep 3s
 
-Type "# Decode emojis back to aliases" Sleep 500ms Enter
-Type 'echo "Deploy completed 🚀 💯" | ./build/emojify --decode' Sleep 800ms Enter Sleep 2s
+Type "# Decode emojis back to aliases"
+Sleep 500ms
+Enter
+Type 'echo "Deploy completed 🚀 💯" | emojify --decode'
+Sleep 500ms
+Enter
+Enter
+Sleep 3s
 
-Type "# Pipeline friendly - process files" Sleep 500ms Enter
-Type 'echo -e ":fire: Performance\n:bug: Bug fix\n:books: Documentation" | ./build/emojify' Sleep 1s Enter Sleep 2s
+Type "# Pipeline friendly - process files"
+Sleep 500ms
+Enter
+Type 'echo -e ":fire: Performance\n:bug: Bug fix\n:books: Documentation" | emojify'
+Sleep 500ms
+Enter
+Enter
+Sleep 3s
 
-Type "# Lightning fast! 169.9x faster than bash version" Sleep 1s Enter Sleep 2s
+Type "# Lightning fast! 169.9x faster than bash version"
+Sleep 500ms
+Enter
+Sleep 3s
